@@ -1,0 +1,6 @@
+[FORMAT]
+indent-string='    '
+
+[MESSAGES CONTROL]
+disable=all
+enable=bad-indentation
