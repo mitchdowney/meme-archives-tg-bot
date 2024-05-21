@@ -39,13 +39,16 @@ def respond():
 
     text = update.message.text.encode('utf-8').decode()
 
+    print("got chat_id :", chat_id)
+    print("got msg_id :", msg_id)
     print("got text message :", text)
 
     if text == "/start":
-        bot_welcome = """
-        Hello. I am Paintbot 9000.
-        """
-        bot.sendMessage(chat_id=chat_id, text=bot_welcome, reply_to_message_id=msg_id)
+        bot_welcome = "Hello. I am Paintbot 9000."
+        try:
+            bot.sendMessage(chat_id=chat_id, text=bot_welcome, reply_to_message_id=msg_id)
+        except Exception as e:
+            print(f"Failed to send message: {e}")
     else:
         try:
             # clear the message we got from any non alphabets
