@@ -1,11 +1,19 @@
 from flask import Flask, request
 import telegram
-from src.credentials import bot_token, bot_user_name, bot_url
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 global bot
 global TOKEN
-TOKEN = bot_token
+TOKEN = os.getenv('BOT_TOKEN')
 bot = telegram.Bot(token=TOKEN)
+
+bot_user_name = os.getenv('BOT_USER_NAME')
+bot_url = os.getenv('BOT_URL')
+
+print(bot_user_name)
 
 app = Flask(__name__)
 
