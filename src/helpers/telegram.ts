@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import { telegramAPIBotUrl } from '../config'
+import { config, telegramAPIBotUrl } from '../config'
 
 const sendTelegramAPIRequest = async (
   path: string,
@@ -14,7 +14,7 @@ export const setWebhook = async (webhookUrl: string) => {
   const response = await sendTelegramAPIRequest('/setWebhook',
     {
       params: { 
-        url: webhookUrl
+        url: `${config.BOT_APP_ORIGIN}/webhook`
       }
     }
   )

@@ -5,7 +5,6 @@ const cors = require('cors')
 
 import * as express from 'express'
 import { Request, Response } from 'express'
-import { config } from './config'
 import { sendMessage, setWebhook } from './helpers/telegram'
 
 const port = 9000
@@ -29,7 +28,7 @@ const startApp = async () => {
 
   app.get('/initiate', async function (req: Request, res: Response) {
     try {
-      await setWebhook(config.BOT_URL)
+      await setWebhook()
       res.send('Webhook set successfully.')
     } catch (error) {
       res.status(400)

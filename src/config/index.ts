@@ -1,6 +1,6 @@
 export const config = {
   BOT_USER_NAME: process.env.BOT_USER_NAME,
-  BOT_URL: process.env.BOT_URL,
+  BOT_APP_ORIGIN: process.env.BOT_APP_ORIGIN,
   BOT_TOKEN: process.env.BOT_TOKEN,
 }
 
