@@ -5,8 +5,8 @@ const cors = require('cors')
 
 import * as express from 'express'
 import { Request, Response } from 'express'
-import { sendMessage, setWebhook } from './helpers/telegram'
 import { config } from './config'
+import { sendMessage, setWebhook } from './helpers/telegram'
 
 const port = 9000
 
