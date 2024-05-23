@@ -6,7 +6,7 @@ const cors = require('cors')
 import * as express from 'express'
 import { NextFunction, Request, Response } from 'express'
 import { HttpError } from 'http-errors'
-import { sendGalleryAdmin, sendMessage, setWebhook } from './services/telegram'
+import { deleteWebhook, sendGalleryAdmin, sendMessage, setWebhook } from './services/telegram'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 
 const port = 9000
@@ -28,10 +28,20 @@ const startApp = async () => {
     res.send('The bot is running!')
   })
 
-  app.get('/initiate', async function (req: Request, res: Response) {
+  app.get('/activate', async function (req: Request, res: Response) {
     try {
       await setWebhook()
       res.send('Webhook set successfully.')
+    } catch (error) {
+      res.status(400)
+      res.send({ message: error.message })
+    }
+  })
+
+  app.get('/deactivate', async function (req: Request, res: Response) {
+    try {
+      await deleteWebhook()
+      res.send('Webhook deleted successfully.')
     } catch (error) {
       res.status(400)
       res.send({ message: error.message })

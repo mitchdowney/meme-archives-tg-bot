@@ -4,7 +4,7 @@ import { configText } from '../config/configurables'
 
 const sendTelegramAPIRequest = async (
   path: string,
-  options: AxiosRequestConfig
+  options: AxiosRequestConfig = {}
 ) => {
   const url = `${telegramAPIBotUrl}${path}`
   const response = await axios(url, {
@@ -27,16 +27,21 @@ export const getChatAdministrators = async (chat_id: string) => {
 }
 
 export const setWebhook = async () => {
-  const secret_key = config.BOT_APP_SECRET_KEY
+  const secret_token = config.BOT_APP_SECRET_TOKEN
   const response = await sendTelegramAPIRequest('/setWebhook',
     {
       params: { 
         url: `${config.BOT_APP_ORIGIN}/webhook`,
-        secret_key
+        secret_token
       }
     }
   )
 
+  return response.data
+}
+
+export const deleteWebhook = async () => {
+  const response = await sendTelegramAPIRequest('/deleteWebhook')
   return response.data
 }
 
