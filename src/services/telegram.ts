@@ -65,13 +65,15 @@ export const sendMessage = async (chat_id: string, text: string, options?: SendM
   return response.data
 }
 
-export const sendImage = async (chat_id: string, imageUrl: string, text: string) => {
+export const sendImage = async (chat_id: string, imageUrl: string,
+  text: string, options?: SendMessageOptions) => {
   const response = await sendTelegramAPIRequest('/sendPhoto',
     {
       params: { 
         chat_id,
         photo: imageUrl,
-        caption: text
+        caption: text,
+        ...(options ? options : {})
       }
     }
   )
