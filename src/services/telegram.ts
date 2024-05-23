@@ -67,8 +67,9 @@ export const sendGalleryAdmin = async (chat_id: string) => {
         reply_markup: JSON.stringify({
           inline_keyboard: [
             [
-              { text: 'Upload', callback_data: 'upload' },
-              { text: 'Edit', callback_data: 'edit' }
+              { text: 'Get', callback_data: 'get_image' },
+              { text: 'Upload', callback_data: 'upload_image' },
+              { text: 'Edit', callback_data: 'edit_image' }
             ]
           ]
         })

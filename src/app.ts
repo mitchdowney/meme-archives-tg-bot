@@ -55,11 +55,24 @@ const startApp = async () => {
     async function (req: Request, res: Response) {
       try {
         const commandText = req?.body?.message?.text
-        const chat_id = req?.body?.message?.chat?.id
-        if ('/gallery_hello' === commandText) {
-          await webhookHandlers.galleryHello(chat_id)
-        } else if ('/gallery_admin' === commandText) {
-          await webhookHandlers.galleryAdmin(chat_id)
+        const callbackData = req.body.callback_query?.data
+        
+        if (commandText) {
+          const chat_id = req?.body?.message?.chat?.id
+          if ('/gallery_hello' === commandText) {
+            await webhookHandlers.galleryHello(chat_id)
+          } else if ('/gallery_admin' === commandText) {
+            await webhookHandlers.galleryAdmin(chat_id)
+          }
+        } else if (callbackData) {
+          const chat_id = req?.body?.callback_query?.message?.chat?.id
+          if ('get_image' === callbackData) {
+            await webhookHandlers.galleryHello(chat_id)
+          } else if ('upload_image' === callbackData) {
+            await webhookHandlers.galleryHello(chat_id)
+          } else if ('edit_image' === callbackData) {
+            await webhookHandlers.galleryHello(chat_id)
+          }
         }
 
         res.send('Webhook message received')
