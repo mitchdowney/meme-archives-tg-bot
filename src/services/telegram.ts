@@ -45,17 +45,51 @@ export const deleteWebhook = async () => {
   return response.data
 }
 
-export const sendMessage = async (chat_id: string, text: string) => {
+
+// NOTE: underscores will break the sendMessage when parse_mode is Markdown
+type SendMessageOptions = {
+  parse_mode?: 'Markdown'
+}
+
+export const sendMessage = async (chat_id: string, text: string, options?: SendMessageOptions) => {
   const response = await sendTelegramAPIRequest('/sendMessage',
     {
       params: { 
         chat_id,
-        text
+        text,
+        ...(options ? options : {})
       }
     }
   )
   
   return response.data
+}
+
+export const sendImage = async (chat_id: string, imageUrl: string, text: string) => {
+  const response = await sendTelegramAPIRequest('/sendPhoto',
+    {
+      params: { 
+        chat_id,
+        photo: imageUrl,
+        caption: text
+      }
+    }
+  )
+
+  return response.data
+}
+
+type ExtraCallbackData = {
+  callback_data: string
+}
+
+const generateCallbackData = (callback_data: string, extraData?: ExtraCallbackData) => {
+  const callbackData = {
+    callback_data,
+    ...(extraData ? extraData : {})
+  }
+
+  return JSON.stringify(callbackData)
 }
 
 export const sendGalleryAdmin = async (chat_id: string) => {
@@ -67,9 +101,9 @@ export const sendGalleryAdmin = async (chat_id: string) => {
         reply_markup: JSON.stringify({
           inline_keyboard: [
             [
-              { text: 'Get', callback_data: 'get_image' },
-              { text: 'Upload', callback_data: 'upload_image' },
-              { text: 'Edit', callback_data: 'edit_image' }
+              { text: 'Get', callback_data: generateCallbackData('gallery_prompt_get_image') },
+              { text: 'Upload', callback_data: generateCallbackData('gallery_prompt_upload_image') },
+              { text: 'Edit', callback_data: generateCallbackData('gallery_prompt_edit_image') }
             ]
           ]
         })
@@ -79,3 +113,9 @@ export const sendGalleryAdmin = async (chat_id: string) => {
   
   return response.data
 }
+
+export const getUserMention = (username = '', userId = '') => {
+  return username
+    ? `@${username}`
+    : `[${userId}](tg://user?id=${userId})`
+} 

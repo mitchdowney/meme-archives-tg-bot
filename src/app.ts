@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config()
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -6,8 +7,10 @@ const cors = require('cors')
 import * as express from 'express'
 import { NextFunction, Request, Response } from 'express'
 import { HttpError } from 'http-errors'
-import { sendGalleryAdmin, sendMessage, setWebhook } from './services/telegram'
+import { getUserMention, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
+import { getGalleryImage } from './services/galleryAPI'
+import { getAvailableImageUrl, getImageInfo } from './lib/galleryHelpers'
 
 const port = 9000
 
@@ -55,29 +58,39 @@ const startApp = async () => {
     async function (req: Request, res: Response) {
       try {
         const commandText = req?.body?.message?.text
-        const callbackData = req.body.callback_query?.data
+        const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
         
         if (commandText) {
           const chat_id = req?.body?.message?.chat?.id
+          const username = req?.body?.message?.from?.username
+          const userId = req?.body?.message?.from?.id
+
           if ('/gallery_hello' === commandText) {
-            await webhookHandlers.galleryHello(chat_id)
+            await webhookHandlers.galleryHello(chat_id, username, userId)
           } else if ('/gallery_admin' === commandText) {
             await webhookHandlers.galleryAdmin(chat_id)
+          } else if (commandText.startsWith('/gallery_get_image')) {
+            await webhookHandlers.galleryGetImage(commandText, chat_id)
           }
-        } else if (callbackData) {
+        } else if (callbackDataObject?.callback_data) {
+          const callback_data = callbackDataObject.callback_data
           const chat_id = req?.body?.callback_query?.message?.chat?.id
-          if ('get_image' === callbackData) {
-            await webhookHandlers.galleryHello(chat_id)
-          } else if ('upload_image' === callbackData) {
-            await webhookHandlers.galleryHello(chat_id)
-          } else if ('edit_image' === callbackData) {
-            await webhookHandlers.galleryHello(chat_id)
+          const username = req?.body?.callback_query?.from?.username
+          const userId = req?.body?.callback_query?.from?.id
+
+          if ('gallery_prompt_get_image' === callback_data) {
+            await webhookHandlers.galleryPromptGetImage(chat_id)
+          } else if ('gallery_prompt_upload_image' === callback_data) {
+            await webhookHandlers.galleryHello(chat_id, username, userId)
+          } else if ('gallery_prompt_edit_image' === callback_data) {
+            await webhookHandlers.galleryHello(chat_id, username, userId)
           }
         }
 
-        res.send('Webhook message received')
+        res.status(200)
+        res.send()
       } catch (error) {
-        res.status(400)
+        res.status(200)
         res.send({ message: error?.response?.data?.description })
       }
     })
@@ -100,10 +113,25 @@ const startApp = async () => {
 })()
 
 const webhookHandlers = {
-  galleryHello: async (chat_id: string) => {
-    await sendMessage(chat_id, 'Hello!')
+  galleryHello: async (chat_id: string, username = '', userId = '') => {
+    const text = `Hello ${getUserMention(username, userId)}`
+    await sendMessage(chat_id, text)
   },
   galleryAdmin: async (chat_id: string) => {
     await sendGalleryAdmin(chat_id)
+  },
+  galleryPromptGetImage: async (chat_id: string) => {
+    await sendMessage(
+      chat_id, 
+      'type \`/gallery_get_image\` followed by the image id or path',
+      { parse_mode: 'Markdown' }
+    )
+  },
+  galleryGetImage: async (commandText: string, chat_id: string) => {
+    const imageId = commandText.split(' ')[1]
+    const image = await getGalleryImage(imageId)
+    const imageUrl = getAvailableImageUrl('no-border', image)
+    const text = getImageInfo(image)
+    await sendImage(chat_id, imageUrl, text)
   }
 }

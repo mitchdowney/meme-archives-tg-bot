@@ -1,20 +1,20 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import { config } from '../config'
 
-export const sendGalleryAPIRequest = async (
+export const galleryAPIRequest = async (
   method: 'GET' | 'POST' = 'GET',
   path: string,
-  options: AxiosRequestConfig
+  options?: AxiosRequestConfig
 ) => {
   const url = `${config.GALLERY_API_ORIGIN}${path}`
   const response = await axios(url, {
     method,
-    ...options
+    ...(options ? options : {})
   })
   return response
 }
 
-export const sendGalleryAPIAdminRequest = async (
+export const galleryAPIAdminRequest = async (
   method: 'GET' | 'POST' = 'GET',
   path: string,
   options: AxiosRequestConfig = {}
@@ -27,5 +27,10 @@ export const sendGalleryAPIAdminRequest = async (
     }
   }
 
-  return sendGalleryAPIRequest(method, path, adminOptions)
+  return galleryAPIRequest(method, path, adminOptions)
+}
+
+export const getGalleryImage = async (imageId: string) => {
+  const response = await galleryAPIRequest('GET', `/image/${imageId}`)
+  return response.data
 }
