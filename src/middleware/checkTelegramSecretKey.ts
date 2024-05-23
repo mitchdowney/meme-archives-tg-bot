@@ -11,7 +11,7 @@ export const checkBotAppSecretKey = (req, res, next) => {
     if (chat_id) {
       sendMessage(chat_id, 'Permission denied.')
     }
-    throw new Unauthorized('Invalid bot app secret key')
+    throw new Unauthorized('Invalid bot app secret key.')
   }
 
   next()
