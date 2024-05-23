@@ -4,8 +4,10 @@ require('dotenv').config()
 const cors = require('cors')
 
 import * as express from 'express'
-import { Request, Response } from 'express'
-import { sendMessage, setWebhook } from './helpers/telegram'
+import { NextFunction, Request, Response } from 'express'
+import { HttpError } from 'http-errors'
+import { sendGalleryAdmin, sendMessage, setWebhook } from './services/telegram'
+import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 
 const port = 9000
 
@@ -36,15 +38,31 @@ const startApp = async () => {
     }
   })
 
-  app.post('/webhook', async function (req: Request, res: Response) {
-    try {
-      const chat_id = req?.body?.message?.chat?.id
-      await sendMessage(chat_id, 'Hello from the node webhook')
-      res.send('Webhook message received')
-    } catch (error) {
-      res.status(400)
-      res.send({ message: error?.response?.data?.description })
-    }
+  app.post('/webhook',
+    checkBotAppSecretKey,
+    async function (req: Request, res: Response) {
+      try {
+        const commandText = req?.body?.message?.text
+        const chat_id = req?.body?.message?.chat?.id
+        if ('/gallery_hello' === commandText) {
+          await webhookHandlers.galleryHello(chat_id)
+        } else if ('/gallery_admin' === commandText) {
+          await webhookHandlers.galleryAdmin(chat_id)
+        }
+
+        res.send('Webhook message received')
+      } catch (error) {
+        res.status(400)
+        res.send({ message: error?.response?.data?.description })
+      }
+    })
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+    res.status(err.status || 500)
+    res.json({
+      message: err.message
+    })
   })
 
   app.listen(port)
@@ -55,3 +73,12 @@ const startApp = async () => {
 (async() => {
   await startApp()
 })()
+
+const webhookHandlers = {
+  galleryHello: async (chat_id: string) => {
+    await sendMessage(chat_id, 'Hello!')
+  },
+  galleryAdmin: async (chat_id: string) => {
+    await sendGalleryAdmin(chat_id)
+  }
+}
