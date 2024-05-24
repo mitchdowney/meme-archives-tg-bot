@@ -2,9 +2,9 @@
 const path = require('path')
 
 import axios, { AxiosRequestConfig } from 'axios'
+import { Request, Response, NextFunction } from 'express'
 import { config, telegramAPIBotFileUrl, telegramAPIBotUrl } from '../config'
 import { configText } from '../config/configurables'
-import { Request } from 'express'
 
 const telegramAPIRequest = async (
   path: string,
@@ -61,6 +61,34 @@ export const deleteWebhook = async () => {
   return response.data
 }
 
+export const checkIsGroupAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const chatId = req?.body?.message?.chat?.id
+      ? req.body.message.chat.id
+      : req.body.callback_query.message.chat.id
+    const userId = req?.body?.message?.from?.id
+      ? req.body.message.from.id
+      : req.body.callback_query.from.id
+
+    const response = await telegramAPIRequest('getChatAdministrators', {
+      params: { chat_id: chatId }
+    })
+
+    const admins = response.data.result
+    const isAdmin = admins.some(admin => admin.user.id === userId)
+
+    if (isAdmin) {
+      next()
+    } else {
+      // Telegram requires a 200 response to avoid retrying the request
+      res.status(200).send('You must be an admin to use this command.')
+    }
+  } catch (error) {
+    console.error(error)
+    // Telegram requires a 200 response to avoid retrying the request
+    res.status(200).send('An error occurred while checking admin status.')
+  }
+}
 
 // NOTE: underscores will break the sendMessage when parse_mode is Markdown
 type SendMessageOptions = {

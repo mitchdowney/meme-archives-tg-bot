@@ -7,7 +7,7 @@ const cors = require('cors')
 import * as express from 'express'
 import { NextFunction, Request, Response } from 'express'
 import { HttpError } from 'http-errors'
-import { getReplyToImageFile, getUserMention, parseEditImageCommand, parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
+import { checkIsGroupAdmin, getReplyToImageFile, getUserMention, parseEditImageCommand, parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { galleryEditImage, galleryGetImage, galleryUploadImage } from './services/galleryAPI'
 import { getArtistNames, getAvailableImageUrl, getImageInfo, getTagTitles } from './lib/galleryHelpers'
@@ -55,6 +55,7 @@ const startApp = async () => {
 
   app.post('/webhook',
     checkBotAppSecretKey,
+    checkIsGroupAdmin,
     async function (req: Request, res: Response) {
       try {
         const commandText = req?.body?.message?.text
@@ -137,21 +138,21 @@ const webhookHandlers = {
   getImagePrompt: async (chat_id: string) => {
     await sendMessage(
       chat_id, 
-      'type \`/get_image\` followed by the image id or slug',
+      'GET: type \`/get_image\` followed by the image id or slug',
       { parse_mode: 'Markdown' }
     )
   },
   uploadImagePrompt: async (chat_id: string) => {
     await sendMessage(
       chat_id, 
-      'reply to a file or message, then type \`/upload_image\` with the following optional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-p url-slug',
+      'UPLOAD: reply to a file or message, then type \`/upload_image\` with the following optional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-p url-slug',
       { parse_mode: 'Markdown' }
     )
   },
   editImagePrompt: async (chat_id: string) => {
     await sendMessage(
       chat_id, 
-      'type \`/edit_image\` with the following required parameter:\n-i id-or-slug\noptional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-p url-slug',
+      'EDIT: type \`/edit_image\` with the following required parameter:\n-i id-or-slug\noptional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-p url-slug',
       { parse_mode: 'Markdown' }
     )
   },
