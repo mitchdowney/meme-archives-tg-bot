@@ -9,8 +9,8 @@ import { NextFunction, Request, Response } from 'express'
 import { HttpError } from 'http-errors'
 import { getReplyToImageFile, getUserMention, parseEditImageCommand, parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
-import { galleryGetImage, galleryUploadImage } from './services/galleryAPI'
-import { getAvailableImageUrl, getImageInfo } from './lib/galleryHelpers'
+import { galleryEditImage, galleryGetImage, galleryUploadImage } from './services/galleryAPI'
+import { getArtistNames, getAvailableImageUrl, getImageInfo, getTagTitles } from './lib/galleryHelpers'
 
 const port = 9000
 
@@ -107,6 +107,10 @@ const startApp = async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.error(err)
+    }
+
     res.status(err.status || 500)
     res.json({
       message: err.message
@@ -180,14 +184,31 @@ const webhookHandlers = {
     }
   },
   editImage: async (commandText: string, chat_id: string, req: Request) => {
-    // const parsedCommand = parseEditImageCommand(commandText)
-    // console.log('parsedCommand', parsedCommand)
-    // const imageBuffer = await getReplyToImageFile(req)
-    // console.log('imageBuffer', imageBuffer.length)
+    const parsedCommand = parseEditImageCommand(commandText)
+    const imageUploadData = await getReplyToImageFile(req)
+  
+    const { id: idOrSlug, title, tagTitles, artistNames, slug } = parsedCommand
+    
+    const previousImageData = await galleryGetImage(idOrSlug)
 
-    // get image data
-    // merge new image data into previous data
-    // edit image
-    // handle response
+    const previousTagTitles = previousImageData.tags?.map(tag => tag.title)
+    const previousArtistNames = previousImageData.artists?.map(artist => artist.name)
+
+    const image = await galleryEditImage(previousImageData.id, {
+      ...previousImageData,
+      ...(title ? { title } : {}),
+      ...(tagTitles?.length ? { tagTitles } : { tagTitles: previousTagTitles }),
+      ...(artistNames?.length ? { artistNames } : { artistNames: previousArtistNames}),
+      ...(slug ? { slug } : {}),
+      imageUploadData
+    })
+
+    const imageUrl = getAvailableImageUrl('no-border', image)
+    const text = getImageInfo(image)
+    if (imageUrl) {
+      await sendImage(chat_id, imageUrl, text)
+    } else {
+      await sendMessage(chat_id, text)
+    }
   }
 }

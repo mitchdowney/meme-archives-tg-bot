@@ -48,7 +48,7 @@ type GalleryUploadImage = {
 }
 
 const getContentTypeFromFilename = (filename: string) => {
-  const extension = filename.split('.').pop()
+  const extension = filename.split('.').pop()?.toLowerCase()
   if (extension === 'png') {
     return 'image/png'
   } else if (extension === 'jpg' || extension === 'jpeg') {
@@ -60,17 +60,20 @@ const getContentTypeFromFilename = (filename: string) => {
   }
 }
 
-export const galleryUploadImage = async (data: GalleryUploadImage) => {  
+const createImageFormData = (data: GalleryUploadImage, id?: number) => {
   const filteredData = {
+    id,
     title: data.title,
     tagTitles: JSON.stringify(data.tagTitles || []),
     artistNames: JSON.stringify(data.artistNames || []),
-    slug: data.slug
+    slug: data.slug,
+    prevent_border_image: config.GALLERY_IMAGE_PREVENT_BORDER_IMAGE,
+    preview_crop_position: config.GALLERY_IMAGE_PREVIEW_CROP_POSITION
   }
 
   const formData = new FormData()
   for (const key in filteredData) {
-    if (filteredData[key]) {
+    if (filteredData[key] || filteredData[key] === '' || filteredData[key] === null) {
       formData.append(key, filteredData[key])
     }
   }
@@ -89,7 +92,26 @@ export const galleryUploadImage = async (data: GalleryUploadImage) => {
     })
   }
 
+  return formData
+}
+
+export const galleryUploadImage = async (data: GalleryUploadImage) => {  
+  const formData = createImageFormData(data)
+
   const response = await galleryAPIAdminRequest('POST', '/image', {
+    headers: {
+      ...formData.getHeaders()
+    },
+    data: formData
+  })
+
+  return response.data
+}
+
+export const galleryEditImage = async (id: number, data: GalleryUploadImage) => {  
+  const formData = createImageFormData(data, id)
+
+  const response = await galleryAPIAdminRequest('POST', '/image/update', {
     headers: {
       ...formData.getHeaders()
     },

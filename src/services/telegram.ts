@@ -268,5 +268,5 @@ export const parseEditImageCommand = createCommandParser(
     },
     s: (value, acc) => { acc.slug = value },
   },
-  ['i']
+  ['id']
 )
