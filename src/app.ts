@@ -97,6 +97,9 @@ const startApp = async () => {
     if (process.env.NODE_ENV === 'development') {
       console.error(error)
     }
+
+    console.log('asdf', req.body)
+
     const chat_id = req?.body?.message?.chat?.id
       ? req.body.message.chat.id
       : req.body.callback_query.message.chat.id
