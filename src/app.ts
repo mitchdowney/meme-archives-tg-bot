@@ -186,6 +186,7 @@ const webhookHandlers = {
       slug,
       imageUploadData
     })
+
     const imageUrl = getAvailableImageUrl('no-border', image)
     const text = getImageInfo(image)
     if (imageUrl) {
