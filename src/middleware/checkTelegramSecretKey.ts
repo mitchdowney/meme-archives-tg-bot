@@ -12,7 +12,7 @@ export const checkBotAppSecretKey = (req, res, next) => {
       sendMessage(chat_id, 'Permission denied.')
     }
     throw new Unauthorized('Invalid bot app secret key.')
+  } else {
+    next()
   }
-
-  next()
 }
