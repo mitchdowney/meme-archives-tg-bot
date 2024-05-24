@@ -15,8 +15,8 @@
 .DS_Store
 Thumbs.db
 
-# # Ignore built ts files
-# dist/**/*
+# Ignore built ts files
+dist/**/*
 
 # Logging files
 *.log
