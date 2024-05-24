@@ -6,6 +6,8 @@ export const checkIsAllowedChat = (req, res, next) => {
     next()
   } else {
     const chat_id = req?.body?.message?.chat?.id
+      ? req.body.message.chat.id
+      : req.body.callback_query.message.chat.id
     if (chat_id && config.BOT_APP_ALLOWED_GROUP_CHAT_IDS.includes(chat_id)) {
       next()
     } else {
