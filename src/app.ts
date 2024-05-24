@@ -7,10 +7,11 @@ const cors = require('cors')
 import * as express from 'express'
 import { NextFunction, Request, Response } from 'express'
 import { HttpError } from 'http-errors'
-import { checkIsGroupAdmin, getReplyToImageFile, getUserMention, parseEditImageCommand, parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
+import { getReplyToImageFile, getUserMention, parseEditImageCommand, parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { galleryEditImage, galleryGetImage, galleryUploadImage } from './services/galleryAPI'
 import { getArtistNames, getAvailableImageUrl, getImageInfo, getTagTitles } from './lib/galleryHelpers'
+import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
 
 const port = 9000
 
@@ -55,7 +56,6 @@ const startApp = async () => {
 
   app.post('/webhook',
     checkBotAppSecretKey,
-    checkIsGroupAdmin,
     async function (req: Request, res: Response) {
       try {
         const commandText = req?.body?.message?.text
@@ -69,12 +69,16 @@ const startApp = async () => {
           if ('/gallery_hello' === commandText) {
             await webhookHandlers.galleryHello(chat_id, username, userId)
           } else if ('/gallery_admin' === commandText) {
+            await checkIsGroupAdmin(req)
             await webhookHandlers.galleryAdmin(chat_id)
           } else if (commandText.startsWith('/get_image')) {
+            await checkIsGroupAdmin(req)
             await webhookHandlers.getImage(commandText, chat_id)
           } else if (commandText.startsWith('/upload_image')) {
+            await checkIsGroupAdmin(req)
             await webhookHandlers.uploadImage(commandText, chat_id, req)
           } else if (commandText.startsWith('/edit_image')) {
+            await checkIsGroupAdmin(req)
             await webhookHandlers.editImage(commandText, chat_id, req)
           }
         } else if (callbackDataObject?.callback_data) {
@@ -82,10 +86,13 @@ const startApp = async () => {
           const chat_id = req?.body?.callback_query?.message?.chat?.id
 
           if ('get_image_prompt' === callback_data) {
+            await checkIsGroupAdmin(req)
             await webhookHandlers.getImagePrompt(chat_id)
           } else if ('upload_image_prompt' === callback_data) {
+            await checkIsGroupAdmin(req)
             await webhookHandlers.uploadImagePrompt(chat_id)
           } else if ('upload_edit_prompt' === callback_data) {
+            await checkIsGroupAdmin(req)
             await webhookHandlers.editImagePrompt(chat_id)
           }
         }
@@ -100,7 +107,6 @@ const startApp = async () => {
           ? error.response.data.message
           : error?.message
         await sendMessage(chat_id, errorMessage)
-        
         res.status(200)
         res.send({ message: errorMessage })
       }
