@@ -18,7 +18,7 @@ export const checkIsGroupAdmin = (req: Request) => {
       const admins = chatAdminsData.result
       const isAdmin = admins.some(admin => admin.user.id === userId)
 
-      if (!isAdmin) {
+      if (isAdmin) {
         resolve()
       } else {
         const errorMessage = 'You must be an admin to use this command.'
