@@ -146,7 +146,7 @@ const webhookHandlers = {
     const chat_id = req?.body?.callback_query?.message?.chat?.id
     await sendMessage(
       chat_id, 
-      'UPLOAD: reply to a file or message, then type \`/upload_image\` with the following optional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-p url-slug',
+      'UPLOAD: reply to a file or message (file is better to prevent TG image compression), then type \`/upload_image\` with the following optional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-p url-slug',
       { parse_mode: 'Markdown' }
     )
   },
