@@ -1,0 +1,29 @@
+{
+  "update_id": 452162419,
+  "message": {
+      "message_id": 57,
+      "from": {
+          "id": 1620725873,
+          "is_bot": false,
+          "first_name": "Mitch",
+          "username": "mitch_d",
+          "language_code": "en",
+          "is_premium": true
+      },
+      "chat": {
+          "id": -4223321390,
+          "title": "Mitch & Paintbot 9000",
+          "type": "group",
+          "all_members_are_administrators": true
+      },
+      "date": 1716333463,
+      "text": "/help",
+      "entities": [
+          {
+              "offset": 0,
+              "length": 6,
+              "type": "bot_command"
+          }
+      ]
+  }
+}
