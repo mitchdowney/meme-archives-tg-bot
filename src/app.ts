@@ -62,38 +62,25 @@ const startApp = async () => {
         const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
         
         if (commandText) {
-          const chat_id = req?.body?.message?.chat?.id
-          const username = req?.body?.message?.from?.username
-          const userId = req?.body?.message?.from?.id
-
           if ('/gallery_hello' === commandText) {
-            await webhookHandlers.galleryHello(chat_id, username, userId)
+            await webhookHandlers.galleryHello(req)
           } else if ('/gallery_admin' === commandText) {
-            await checkIsGroupAdmin(req)
-            await webhookHandlers.galleryAdmin(chat_id)
+            await webhookHandlers.galleryAdmin(req)
           } else if (commandText.startsWith('/get_image')) {
-            await checkIsGroupAdmin(req)
-            await webhookHandlers.getImage(commandText, chat_id)
+            await webhookHandlers.getImage(req)
           } else if (commandText.startsWith('/upload_image')) {
-            await checkIsGroupAdmin(req)
-            await webhookHandlers.uploadImage(commandText, chat_id, req)
+            await webhookHandlers.uploadImage(req)
           } else if (commandText.startsWith('/edit_image')) {
-            await checkIsGroupAdmin(req)
-            await webhookHandlers.editImage(commandText, chat_id, req)
+            await webhookHandlers.editImage(req)
           }
         } else if (callbackDataObject?.callback_data) {
           const callback_data = callbackDataObject.callback_data
-          const chat_id = req?.body?.callback_query?.message?.chat?.id
-
           if ('get_image_prompt' === callback_data) {
-            await checkIsGroupAdmin(req)
-            await webhookHandlers.getImagePrompt(chat_id)
+            await webhookHandlers.getImagePrompt(req)
           } else if ('upload_image_prompt' === callback_data) {
-            await checkIsGroupAdmin(req)
-            await webhookHandlers.uploadImagePrompt(chat_id)
+            await webhookHandlers.uploadImagePrompt(req)
           } else if ('upload_edit_prompt' === callback_data) {
-            await checkIsGroupAdmin(req)
-            await webhookHandlers.editImagePrompt(chat_id)
+            await webhookHandlers.editImagePrompt(req)
           }
         }
 
@@ -108,7 +95,7 @@ const startApp = async () => {
           : error?.message
         await sendMessage(chat_id, errorMessage)
         res.status(200)
-        res.send({ message: errorMessage })
+        res.send()
       }
     })
 
@@ -134,42 +121,59 @@ const startApp = async () => {
 })()
 
 const webhookHandlers = {
-  galleryHello: async (chat_id: string, username = '', userId = '') => {
+  galleryHello: async (req: Request) => {
+    const chat_id = req?.body?.message?.chat?.id
+    const username = req?.body?.message?.from?.username
+    const userId = req?.body?.message?.from?.id
     const text = `Hello ${getUserMention(username, userId)}`
     await sendMessage(chat_id, text)
   },
-  galleryAdmin: async (chat_id: string) => {
+  galleryAdmin: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const chat_id = req?.body?.message?.chat?.id
     await sendGalleryAdmin(chat_id)
   },
-  getImagePrompt: async (chat_id: string) => {
+  getImagePrompt: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const chat_id = req?.body?.callback_query?.message?.chat?.id
     await sendMessage(
       chat_id, 
       'GET: type \`/get_image\` followed by the image id or slug',
       { parse_mode: 'Markdown' }
     )
   },
-  uploadImagePrompt: async (chat_id: string) => {
+  uploadImagePrompt: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const chat_id = req?.body?.callback_query?.message?.chat?.id
     await sendMessage(
       chat_id, 
       'UPLOAD: reply to a file or message, then type \`/upload_image\` with the following optional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-p url-slug',
       { parse_mode: 'Markdown' }
     )
   },
-  editImagePrompt: async (chat_id: string) => {
+  editImagePrompt: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const chat_id = req?.body?.callback_query?.message?.chat?.id
     await sendMessage(
       chat_id, 
       'EDIT: type \`/edit_image\` with the following required parameter:\n-i id-or-slug\noptional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-p url-slug',
       { parse_mode: 'Markdown' }
     )
   },
-  getImage: async (commandText: string, chat_id: string) => {
+  getImage: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const commandText = req?.body?.message?.text
+    const chat_id = req?.body?.message?.chat?.id
     const imageId = commandText.split(' ')[1]
     const image = await galleryGetImage(imageId)
     const imageUrl = getAvailableImageUrl('no-border', image)
     const text = getImageInfo(image)
     await sendImage(chat_id, imageUrl, text)
   },
-  uploadImage: async (commandText: string, chat_id: string, req: Request) => {
+  uploadImage: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const commandText = req?.body?.message?.text
+    const chat_id = req?.body?.message?.chat?.id
     const parsedCommand = parseUploadImageCommand(commandText)
     const imageUploadData = await getReplyToImageFile(req)
   
@@ -190,7 +194,10 @@ const webhookHandlers = {
       await sendMessage(chat_id, text)
     }
   },
-  editImage: async (commandText: string, chat_id: string, req: Request) => {
+  editImage: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const commandText = req?.body?.message?.text
+    const chat_id = req?.body?.message?.chat?.id
     const parsedCommand = parseEditImageCommand(commandText)
     const imageUploadData = await getReplyToImageFile(req)
   
