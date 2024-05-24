@@ -67,11 +67,11 @@ const startApp = async () => {
             await webhookHandlers.galleryHello(req)
           } else if ('/gallery_admin' === commandText) {
             await webhookHandlers.galleryAdmin(req)
-          } else if (commandText.startsWith('/get_image')) {
+          } else if (commandText.startsWith('/get_image ')) {
             await webhookHandlers.getImage(req)
-          } else if (commandText.startsWith('/upload_image')) {
+          } else if (commandText.startsWith('/upload_image ')) {
             await webhookHandlers.uploadImage(req)
-          } else if (commandText.startsWith('/edit_image')) {
+          } else if (commandText.startsWith('/edit_image ')) {
             await webhookHandlers.editImage(req)
           }
         } else if (callbackDataObject?.callback_data) {
