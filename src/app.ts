@@ -97,13 +97,13 @@ const startApp = async () => {
     if (process.env.NODE_ENV === 'development') {
       console.error(error)
     }
-    const chat_id = req?.body?.message?.chat?.id
-      ? req.body.message.chat.id
-      : req.body.callback_query.message.chat.id
-    const errorMessage = error?.response?.data?.message
-      ? error.response.data.message
-      : error?.message
-    sendMessage(chat_id, errorMessage)
+
+    const chat_id = req?.body?.message?.chat?.id || req?.body?.callback_query?.message?.chat?.id
+    const errorMessage = error?.response?.data?.message || error?.message
+
+    if (chat_id && errorMessage) {
+      sendMessage(chat_id, errorMessage)
+    }
     
     // Telegram must always receive a 200 response, or it will keep retrying
     res.status(200)
