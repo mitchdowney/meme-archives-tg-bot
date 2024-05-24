@@ -58,35 +58,38 @@ const startApp = async () => {
   app.post('/webhook',
     checkBotAppSecretKey,
     checkIsAllowedChat,
-    async function (req: Request, res: Response) {
-      const commandText = req?.body?.message?.text
-      const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
-      
-      if (commandText) {
-        if ('/gallery_hello' === commandText) {
-          await webhookHandlers.galleryHello(req)
-        } else if ('/gallery_admin' === commandText) {
-          await webhookHandlers.galleryAdmin(req)
-        } else if (commandText.startsWith('/get_image')) {
-          await webhookHandlers.getImage(req)
-        } else if (commandText.startsWith('/upload_image')) {
-          await webhookHandlers.uploadImage(req)
-        } else if (commandText.startsWith('/edit_image')) {
-          await webhookHandlers.editImage(req)
+    async function (req: Request, res: Response, next: NextFunction) {
+      try {
+        const commandText = req?.body?.message?.text
+        const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
+        if (commandText) {
+          if ('/gallery_hello' === commandText) {
+            await webhookHandlers.galleryHello(req)
+          } else if ('/gallery_admin' === commandText) {
+            await webhookHandlers.galleryAdmin(req)
+          } else if (commandText.startsWith('/get_image')) {
+            await webhookHandlers.getImage(req)
+          } else if (commandText.startsWith('/upload_image')) {
+            await webhookHandlers.uploadImage(req)
+          } else if (commandText.startsWith('/edit_image')) {
+            await webhookHandlers.editImage(req)
+          }
+        } else if (callbackDataObject?.callback_data) {
+          const callback_data = callbackDataObject.callback_data
+          if ('get_image_prompt' === callback_data) {
+            await webhookHandlers.getImagePrompt(req)
+          } else if ('upload_image_prompt' === callback_data) {
+            await webhookHandlers.uploadImagePrompt(req)
+          } else if ('upload_edit_prompt' === callback_data) {
+            await webhookHandlers.editImagePrompt(req)
+          }
         }
-      } else if (callbackDataObject?.callback_data) {
-        const callback_data = callbackDataObject.callback_data
-        if ('get_image_prompt' === callback_data) {
-          await webhookHandlers.getImagePrompt(req)
-        } else if ('upload_image_prompt' === callback_data) {
-          await webhookHandlers.uploadImagePrompt(req)
-        } else if ('upload_edit_prompt' === callback_data) {
-          await webhookHandlers.editImagePrompt(req)
-        }
-      }
 
-      res.status(200)
-      res.send()
+        res.status(200)
+        res.send()
+      } catch (error) {
+        next(error)
+      }
     })
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
