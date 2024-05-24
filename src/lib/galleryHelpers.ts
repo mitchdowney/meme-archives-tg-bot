@@ -2,9 +2,15 @@ import { config } from '../config'
 
 type ImageVersion = 'animation' | 'border' | 'no-border' | 'preview'
 
+const hasImageUrl = (image: { has_border: boolean,
+  has_no_border: boolean, has_animation: boolean }) => {
+  return image.has_border || image.has_no_border || image.has_animation
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getAvailableImageUrl = (preferredVersion: ImageVersion | null, image: any | null) => {
   if (!image) return ''
+  if (!hasImageUrl(image)) return ''
   const availableImageVersion = getAvailableImageVersion(preferredVersion, image)
   return getImageUrl(image.id, availableImageVersion)
 }
@@ -58,9 +64,9 @@ export const getArtistNames = (artists: { name: string }[]) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getImageInfo = (image: any) => {
-  const imageWebLink = getImageWebLink(image.slug || image.id)
   const tagTitles = getTagTitles(image.tags)
   const artistNames = getArtistNames(image.artists)
+  const imageWebLink = getImageWebLink(image.slug || image.id)
 
-  return `Title: ${image.title}\nTags: ${tagTitles ? tagTitles : ''}${artistNames ? `\nArtist: ${artistNames}` : ''}\nID: ${image.id}${image.slug ? `\nPath: ${image.slug}` : ''}\nWeb Link: ${imageWebLink}`
+  return `Title: ${image.title}${tagTitles ? `\nTags: ${tagTitles}` : ''}${artistNames ? `\nArtist: ${artistNames}` : ''}\nID: ${image.id}${image.slug ? `\nSlug: ${image.slug}` : ''}\nWeb Link: ${imageWebLink}`
 }

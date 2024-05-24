@@ -11,3 +11,4 @@ export const config = {
 }
 
 export const telegramAPIBotUrl = `https://api.telegram.org/bot${config.BOT_TOKEN}`
+export const telegramAPIBotFileUrl = `https://api.telegram.org/file/bot${config.BOT_TOKEN}`

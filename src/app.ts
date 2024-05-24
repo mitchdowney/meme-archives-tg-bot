@@ -7,9 +7,9 @@ const cors = require('cors')
 import * as express from 'express'
 import { NextFunction, Request, Response } from 'express'
 import { HttpError } from 'http-errors'
-import { getUserMention, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
+import { getReplyToImageFile, getUserMention, parseEditImageCommand, parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
-import { getGalleryImage } from './services/galleryAPI'
+import { galleryGetImage, galleryUploadImage } from './services/galleryAPI'
 import { getAvailableImageUrl, getImageInfo } from './lib/galleryHelpers'
 
 const port = 9000
@@ -69,29 +69,39 @@ const startApp = async () => {
             await webhookHandlers.galleryHello(chat_id, username, userId)
           } else if ('/gallery_admin' === commandText) {
             await webhookHandlers.galleryAdmin(chat_id)
-          } else if (commandText.startsWith('/gallery_get_image')) {
-            await webhookHandlers.galleryGetImage(commandText, chat_id)
+          } else if (commandText.startsWith('/get_image')) {
+            await webhookHandlers.getImage(commandText, chat_id)
+          } else if (commandText.startsWith('/upload_image')) {
+            await webhookHandlers.uploadImage(commandText, chat_id, req)
+          } else if (commandText.startsWith('/edit_image')) {
+            await webhookHandlers.editImage(commandText, chat_id, req)
           }
         } else if (callbackDataObject?.callback_data) {
           const callback_data = callbackDataObject.callback_data
           const chat_id = req?.body?.callback_query?.message?.chat?.id
-          const username = req?.body?.callback_query?.from?.username
-          const userId = req?.body?.callback_query?.from?.id
 
-          if ('gallery_prompt_get_image' === callback_data) {
-            await webhookHandlers.galleryPromptGetImage(chat_id)
-          } else if ('gallery_prompt_upload_image' === callback_data) {
-            await webhookHandlers.galleryHello(chat_id, username, userId)
-          } else if ('gallery_prompt_edit_image' === callback_data) {
-            await webhookHandlers.galleryHello(chat_id, username, userId)
+          if ('get_image_prompt' === callback_data) {
+            await webhookHandlers.getImagePrompt(chat_id)
+          } else if ('upload_image_prompt' === callback_data) {
+            await webhookHandlers.uploadImagePrompt(chat_id)
+          } else if ('upload_edit_prompt' === callback_data) {
+            await webhookHandlers.editImagePrompt(chat_id)
           }
         }
 
         res.status(200)
         res.send()
       } catch (error) {
+        const chat_id = req?.body?.message?.chat?.id
+          ? req.body.message.chat.id
+          : req.body.callback_query.message.chat.id
+        const errorMessage = error?.response?.data?.message
+          ? error.response.data.message
+          : error?.message
+        await sendMessage(chat_id, errorMessage)
+        
         res.status(200)
-        res.send({ message: error?.response?.data?.description })
+        res.send({ message: errorMessage })
       }
     })
 
@@ -120,18 +130,64 @@ const webhookHandlers = {
   galleryAdmin: async (chat_id: string) => {
     await sendGalleryAdmin(chat_id)
   },
-  galleryPromptGetImage: async (chat_id: string) => {
+  getImagePrompt: async (chat_id: string) => {
     await sendMessage(
       chat_id, 
-      'type \`/gallery_get_image\` followed by the image id or path',
+      'type \`/get_image\` followed by the image id or slug',
       { parse_mode: 'Markdown' }
     )
   },
-  galleryGetImage: async (commandText: string, chat_id: string) => {
+  uploadImagePrompt: async (chat_id: string) => {
+    await sendMessage(
+      chat_id, 
+      'reply to a file or message, then type \`/upload_image\` with the following optional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-p url-slug',
+      { parse_mode: 'Markdown' }
+    )
+  },
+  editImagePrompt: async (chat_id: string) => {
+    await sendMessage(
+      chat_id, 
+      'type \`/edit_image\` with the following required parameter:\n-i id-or-slug\noptional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-p url-slug',
+      { parse_mode: 'Markdown' }
+    )
+  },
+  getImage: async (commandText: string, chat_id: string) => {
     const imageId = commandText.split(' ')[1]
-    const image = await getGalleryImage(imageId)
+    const image = await galleryGetImage(imageId)
     const imageUrl = getAvailableImageUrl('no-border', image)
     const text = getImageInfo(image)
     await sendImage(chat_id, imageUrl, text)
+  },
+  uploadImage: async (commandText: string, chat_id: string, req: Request) => {
+    const parsedCommand = parseUploadImageCommand(commandText)
+    const imageUploadData = await getReplyToImageFile(req)
+  
+    const { title, tagTitles, artistNames, slug } = parsedCommand
+    
+    const image = await galleryUploadImage({
+      title,
+      tagTitles,
+      artistNames,
+      slug,
+      imageUploadData
+    })
+    const imageUrl = getAvailableImageUrl('no-border', image)
+    const text = getImageInfo(image)
+    if (imageUrl) {
+      await sendImage(chat_id, imageUrl, text)
+    } else {
+      await sendMessage(chat_id, text)
+    }
+  },
+  editImage: async (commandText: string, chat_id: string, req: Request) => {
+    // const parsedCommand = parseEditImageCommand(commandText)
+    // console.log('parsedCommand', parsedCommand)
+    // const imageBuffer = await getReplyToImageFile(req)
+    // console.log('imageBuffer', imageBuffer.length)
+
+    // get image data
+    // merge new image data into previous data
+    // edit image
+    // handle response
   }
 }
