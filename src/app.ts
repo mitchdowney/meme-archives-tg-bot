@@ -7,11 +7,12 @@ const cors = require('cors')
 import * as express from 'express'
 import { NextFunction, Request, Response } from 'express'
 import { HttpError } from 'http-errors'
-import { getReplyToImageFile, getUserMention, parseEditImageCommand, parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
+import { getAvailableImageUrl, getImageInfo } from './lib/galleryHelpers'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
-import { galleryEditImage, galleryGetImage, galleryUploadImage } from './services/galleryAPI'
-import { getArtistNames, getAvailableImageUrl, getImageInfo, getTagTitles } from './lib/galleryHelpers'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
+import { galleryEditImage, galleryGetImage, galleryUploadImage } from './services/galleryAPI'
+import { getReplyToImageFile, getUserMention, parseEditImageCommand, parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
+import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
 
 const port = 9000
 
@@ -56,59 +57,54 @@ const startApp = async () => {
 
   app.post('/webhook',
     checkBotAppSecretKey,
+    checkIsAllowedChat,
     async function (req: Request, res: Response) {
-      try {
-        const commandText = req?.body?.message?.text
-        const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
-        
-        if (commandText) {
-          if ('/gallery_hello' === commandText) {
-            await webhookHandlers.galleryHello(req)
-          } else if ('/gallery_admin' === commandText) {
-            await webhookHandlers.galleryAdmin(req)
-          } else if (commandText.startsWith('/get_image')) {
-            await webhookHandlers.getImage(req)
-          } else if (commandText.startsWith('/upload_image')) {
-            await webhookHandlers.uploadImage(req)
-          } else if (commandText.startsWith('/edit_image')) {
-            await webhookHandlers.editImage(req)
-          }
-        } else if (callbackDataObject?.callback_data) {
-          const callback_data = callbackDataObject.callback_data
-          if ('get_image_prompt' === callback_data) {
-            await webhookHandlers.getImagePrompt(req)
-          } else if ('upload_image_prompt' === callback_data) {
-            await webhookHandlers.uploadImagePrompt(req)
-          } else if ('upload_edit_prompt' === callback_data) {
-            await webhookHandlers.editImagePrompt(req)
-          }
+      const commandText = req?.body?.message?.text
+      const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
+      
+      if (commandText) {
+        if ('/gallery_hello' === commandText) {
+          await webhookHandlers.galleryHello(req)
+        } else if ('/gallery_admin' === commandText) {
+          await webhookHandlers.galleryAdmin(req)
+        } else if (commandText.startsWith('/get_image')) {
+          await webhookHandlers.getImage(req)
+        } else if (commandText.startsWith('/upload_image')) {
+          await webhookHandlers.uploadImage(req)
+        } else if (commandText.startsWith('/edit_image')) {
+          await webhookHandlers.editImage(req)
         }
-
-        res.status(200)
-        res.send()
-      } catch (error) {
-        const chat_id = req?.body?.message?.chat?.id
-          ? req.body.message.chat.id
-          : req.body.callback_query.message.chat.id
-        const errorMessage = error?.response?.data?.message
-          ? error.response.data.message
-          : error?.message
-        await sendMessage(chat_id, errorMessage)
-        res.status(200)
-        res.send()
+      } else if (callbackDataObject?.callback_data) {
+        const callback_data = callbackDataObject.callback_data
+        if ('get_image_prompt' === callback_data) {
+          await webhookHandlers.getImagePrompt(req)
+        } else if ('upload_image_prompt' === callback_data) {
+          await webhookHandlers.uploadImagePrompt(req)
+        } else if ('upload_edit_prompt' === callback_data) {
+          await webhookHandlers.editImagePrompt(req)
+        }
       }
+
+      res.status(200)
+      res.send()
     })
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+  app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
     if (process.env.NODE_ENV === 'development') {
-      console.error(err)
+      console.error(error)
     }
-
-    res.status(err.status || 500)
-    res.json({
-      message: err.message
-    })
+    const chat_id = req?.body?.message?.chat?.id
+      ? req.body.message.chat.id
+      : req.body.callback_query.message.chat.id
+    const errorMessage = error?.response?.data?.message
+      ? error.response.data.message
+      : error?.message
+    sendMessage(chat_id, errorMessage)
+    
+    // Telegram must always receive a 200 response, or it will keep retrying
+    res.status(200)
+    res.send()
   })
 
   app.listen(port)

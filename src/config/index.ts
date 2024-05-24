@@ -3,6 +3,11 @@ export const config = {
   BOT_TOKEN: process.env.BOT_TOKEN,
   BOT_APP_ORIGIN: process.env.BOT_APP_ORIGIN,
   BOT_APP_SECRET_TOKEN: process.env.BOT_APP_SECRET_TOKEN,
+  BOT_APP_ALLOW_ALL_GROUP_CHATS: process.env.BOT_APP_ALLOW_ALL_GROUP_CHATS?.toLowerCase() === 'true',
+  BOT_APP_ALLOWED_GROUP_CHAT_IDS: process.env.BOT_APP_ALLOWED_GROUP_CHAT_IDS
+    ?.split(',')
+    .map(Number)
+    .filter(Number.isInteger),
   GALLERY_WEB_ORIGIN: process.env.GALLERY_WEB_ORIGIN,
   GALLERY_API_ORIGIN: process.env.GALLERY_API_ORIGIN,
   GALLERY_API_SECRET_KEY: process.env.GALLERY_API_SECRET_KEY,
