@@ -195,7 +195,7 @@ export const createCommandParser = (
       throw new Error('Invalid command')
     }
 
-    const parts = commandText.split(' -').slice(1) // Skip the first part
+    const parts = commandText.split(/ -(?=\w)/).slice(1)
     let parsedCommand
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
