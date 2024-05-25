@@ -1,0 +1,6 @@
+These can get set with the BotFather:
+
+/gallery_admin - Get started with the gallery
+/upload_image - Upload image to gallery
+/edit_image - Edit image in gallery
+/gallery_hello - Send a test message in gallery
