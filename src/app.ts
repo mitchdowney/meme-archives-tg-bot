@@ -152,7 +152,7 @@ const webhookHandlers = {
     const chat_id = req?.body?.callback_query?.message?.chat?.id
     await sendMessage(
       chat_id, 
-      'UPLOAD: reply to a file or image (file is better to prevent TG image compression), then type \`/upload_image\` with the following optional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-p url-slug',
+      'UPLOAD: reply to a file or image (file is better to prevent TG image compression), then type \`/upload_image\` with the following optional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-s url-slug',
       { parse_mode: 'Markdown' }
     )
   },
@@ -161,7 +161,7 @@ const webhookHandlers = {
     const chat_id = req?.body?.callback_query?.message?.chat?.id
     await sendMessage(
       chat_id, 
-      'EDIT: type \`/edit_image\` with the following required parameter:\n-i id-or-slug\noptional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-p url-slug',
+      'EDIT: type \`/edit_image\` with the following required parameter:\n-i id-or-slug\noptional parameters:\n-t title\n-ts tags,separated,by,comma\n-a artists,separated,by,comma\n-s url-slug',
       { parse_mode: 'Markdown' }
     )
   },
