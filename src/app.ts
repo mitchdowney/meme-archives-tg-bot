@@ -173,7 +173,11 @@ const webhookHandlers = {
     const image = await galleryGetImage(imageId)
     const imageUrl = getAvailableImageUrl('no-border', image)
     const text = getImageInfo(image)
-    await sendImage(chat_id, imageUrl, text)
+    if (imageUrl) {
+      await sendImage(chat_id, imageUrl, text)
+    } else {
+      await sendMessage(chat_id, text)
+    }
   },
   uploadImage: async (req: Request) => {
     await checkIsGroupAdmin(req)
