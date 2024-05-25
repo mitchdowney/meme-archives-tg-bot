@@ -13,6 +13,7 @@ import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
 import { galleryEditImage, galleryGetImage, galleryUploadImage } from './services/galleryAPI'
 import { getReplyToImageFile, getUserMention, parseEditImageCommand, parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
 import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
+import { config } from './config'
 
 const port = 9000
 
@@ -63,25 +64,30 @@ const startApp = async () => {
         const commandText = req?.body?.message?.text
         const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
         if (commandText) {
-          if ('/gallery_hello' === commandText) {
-            await webhookHandlers.galleryHello(req)
-          } else if ('/gallery_admin' === commandText) {
-            await webhookHandlers.galleryAdmin(req)
-          } else if (commandText.startsWith('/get_image ')) {
-            await webhookHandlers.getImage(req)
-          } else if (commandText.startsWith('/upload_image ')) {
-            await webhookHandlers.uploadImage(req)
-          } else if (commandText.startsWith('/edit_image ')) {
-            await webhookHandlers.editImage(req)
+          const commands = {
+            '/gallery_hello': webhookHandlers.galleryHello,
+            '/gallery_admin': webhookHandlers.galleryAdmin,
+            '/get_image': webhookHandlers.getImage,
+            '/upload_image': webhookHandlers.uploadImage,
+            '/edit_image': webhookHandlers.editImage,
+          }
+          
+          for (const [command, handler] of Object.entries(commands)) {
+            if (new RegExp(`^${command}( |@${config.BOT_USER_NAME})?$`).test(commandText)) {
+              await handler(req)
+              break
+            }
           }
         } else if (callbackDataObject?.callback_data) {
-          const callback_data = callbackDataObject.callback_data
-          if ('get_image_prompt' === callback_data) {
-            await webhookHandlers.getImagePrompt(req)
-          } else if ('upload_image_prompt' === callback_data) {
-            await webhookHandlers.uploadImagePrompt(req)
-          } else if ('upload_edit_prompt' === callback_data) {
-            await webhookHandlers.editImagePrompt(req)
+          const callbackDataHandlers = {
+            'get_image_prompt': webhookHandlers.getImagePrompt,
+            'upload_image_prompt': webhookHandlers.uploadImagePrompt,
+            'upload_edit_prompt': webhookHandlers.editImagePrompt,
+          }
+        
+          const handler = callbackDataHandlers[callbackDataObject.callback_data]
+          if (handler) {
+            await handler(req)
           }
         }
 
