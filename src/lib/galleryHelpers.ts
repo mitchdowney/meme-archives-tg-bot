@@ -85,10 +85,11 @@ export const getArtistInfo = (artist: any) => {
 type ArtistProfilePictureVersion = 'original' | 'preview'
 
 export const getArtistProfilePictureUrl = (id: number, artistVersion: ArtistProfilePictureVersion) => {
+  const bucketOrigin = config.GALLERY_IMAGE_BUCKET_ORIGIN
   if (artistVersion === 'preview') {
-    return `${process.env.NEXT_PUBLIC_S3_BUCKET_URL}/artists/${id}-preview.png`
+    return `${bucketOrigin}/artists/${id}-preview.png`
   } else if (artistVersion === 'original') {
-    return `${process.env.NEXT_PUBLIC_S3_BUCKET_URL}/artists/${id}-original.png`
+    return `${bucketOrigin}/artists/${id}-original.png`
   } else {
     return ''
   }
