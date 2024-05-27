@@ -7,7 +7,7 @@ const cors = require('cors')
 import * as express from 'express'
 import { NextFunction, Request, Response } from 'express'
 import { HttpError } from 'http-errors'
-import { getArtistProfilePictureUrl, getAvailableImageUrl, getImageInfo } from './lib/galleryHelpers'
+import { getArtistInfo, getArtistProfilePictureUrl, getAvailableImageUrl, getImageInfo } from './lib/galleryHelpers'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
 import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryUploadImage } from './services/galleryAPI'
@@ -286,7 +286,7 @@ const webhookHandlers = {
     })
 
     const imageUrl = getArtistProfilePictureUrl(previousArtistData.id, 'original')
-    const text = getImageInfo(image)
+    const text = getArtistInfo(image)
     if (imageUrl) {
       await sendImage(chat_id, imageUrl, text)
     } else {
