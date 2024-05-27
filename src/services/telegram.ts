@@ -140,25 +140,31 @@ export const getUserMention = (username = '', userId = '') => {
     : `[${userId}](tg://user?id=${userId})`
 } 
 
-export const getReplyToImageFile = async (req: Request) => {
-  const replyToMessage = req?.body?.message?.reply_to_message
+export const getImageFile = async (req: Request) => {
+  const originalMessage = req?.body?.message
+  const replyToMessage = originalMessage?.reply_to_message
   let fileId = null
 
-  if (replyToMessage) {
-    const photo = replyToMessage.photo
-    const document = replyToMessage.document
+  // Check both the original message and the reply message
+  const messagesToCheck = [originalMessage, replyToMessage]
 
-    if (photo) {
-      // The photo field is an array of different sizes of the photo.
-      // You can get the file_id of the largest photo like this:
-      const largestPhoto = photo[photo.length - 1]
-      fileId = largestPhoto.file_id
-    }
+  for (const message of messagesToCheck) {
+    if (message) {
+      const photo = message.photo
+      const document = message.document
 
-    if (document) {
-      // The document field contains information about the document.
-      // You can get the file_id of the document like this:
-      fileId = document.file_id
+      if (photo) {
+        // The photo field is an array of different sizes of the photo.
+        // You can get the file_id of the largest photo like this:
+        const largestPhoto = photo[photo.length - 1]
+        fileId = largestPhoto.file_id
+      }
+
+      if (document) {
+        // The document field contains information about the document.
+        // You can get the file_id of the document like this:
+        fileId = document.file_id
+      }
     }
   }
 
@@ -171,12 +177,13 @@ export const getReplyToImageFile = async (req: Request) => {
       file_id: fileId
     }
   })
-  
+
   const filePath = response.data.result.file_path
   const filename = path.basename(filePath)
   const imageBuffer = await telegramAPIFileRequest(filePath, {
     responseType: 'arraybuffer'
   })
+
   return {
     filename,
     buffer: imageBuffer.data

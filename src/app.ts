@@ -11,7 +11,7 @@ import { getArtistInfo, getArtistProfilePictureUrl, getAvailableImageUrl, getIma
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
 import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryUploadImage } from './services/galleryAPI'
-import { getReplyToImageFile, getUserMention, parseEditArtistCommand, parseEditImageCommand,
+import { getImageFile, getUserMention, parseEditArtistCommand, parseEditImageCommand,
   parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
 import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
 import { config } from './config'
@@ -218,7 +218,7 @@ const webhookHandlers = {
     const commandText = req?.body?.message?.text
     const chat_id = req?.body?.message?.chat?.id
     const parsedCommand = parseUploadImageCommand(commandText)
-    const imageUploadData = await getReplyToImageFile(req)
+    const imageUploadData = await getImageFile(req)
   
     const { title, tagTitles, artistNames, slug } = parsedCommand
     
@@ -243,7 +243,7 @@ const webhookHandlers = {
     const commandText = req?.body?.message?.text
     const chat_id = req?.body?.message?.chat?.id
     const parsedCommand = parseEditImageCommand(commandText)
-    const imageUploadData = await getReplyToImageFile(req)
+    const imageUploadData = await getImageFile(req)
   
     const { id: idOrSlug, title, tagTitles, artistNames, slug } = parsedCommand
     
@@ -274,7 +274,7 @@ const webhookHandlers = {
     const commandText = req?.body?.message?.text
     const chat_id = req?.body?.message?.chat?.id
     const parsedCommand = parseEditArtistCommand(commandText)
-    const imageUploadData = await getReplyToImageFile(req)
+    const imageUploadData = await getImageFile(req)
   
     const { id: idOrSlug, name, slug, deca_username, foundation_username,
       instagram_username, superrare_username, twitter_username
