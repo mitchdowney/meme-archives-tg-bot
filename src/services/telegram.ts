@@ -119,7 +119,9 @@ export const sendGalleryAdmin = async (chat_id: string) => {
           inline_keyboard: [
             [
               { text: 'Get Image', callback_data: generateCallbackData('get_image_prompt') },
-              { text: 'Upload Image', callback_data: generateCallbackData('upload_image_prompt') },
+              { text: 'Upload Image', callback_data: generateCallbackData('upload_image_prompt') }
+            ],
+            [
               { text: 'Edit Image', callback_data: generateCallbackData('edit_image_prompt') },
               { text: 'Edit Artist', callback_data: generateCallbackData('edit_artist_prompt') }
             ]
