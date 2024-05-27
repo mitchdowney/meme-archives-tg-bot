@@ -70,3 +70,26 @@ export const getImageInfo = (image: any) => {
 
   return `Title: ${image.title}${tagTitles ? `\nTags: ${tagTitles}` : ''}${artistNames ? `\nArtist: ${artistNames}` : ''}\nID: ${image.id}${image.slug ? `\nSlug: ${image.slug}` : ''}\nWeb Link: ${imageWebLink}`
 }
+
+export const getArtistWebLink = (id: number | string) => {
+  return `${config.GALLERY_WEB_ORIGIN}/artist/${id}`
+}
+
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getArtistInfo = (artist: any) => {
+  const artistWebLink = getArtistWebLink(artist.slug || artist.id)
+  return `Name: ${artist.name}${artist.slug ? `\nSlug: ${artist.slug}` : ''}${artist.deca_username ? `\nDeca: ${artist.deca_username}` : ''}${artist.foundation_username ? `\nFoundation: ${artist.foundation_username}` : ''}${artist.instagram_username ? `\nInstagram: ${artist.instagram_username}` : ''}${artist.superrare_username ? `\nSuperrare: ${artist.superrare_username}` : ''}${artist.twitter_username ? `\nTwitter: ${artist.twitter_username}` : ''}\nWeb Link: ${artistWebLink}`
+}
+
+type ArtistProfilePictureVersion = 'original' | 'preview'
+
+export const getArtistProfilePictureUrl = (id: number, artistVersion: ArtistProfilePictureVersion) => {
+  if (artistVersion === 'preview') {
+    return `${process.env.NEXT_PUBLIC_S3_BUCKET_URL}/artists/${id}-preview.png`
+  } else if (artistVersion === 'original') {
+    return `${process.env.NEXT_PUBLIC_S3_BUCKET_URL}/artists/${id}-original.png`
+  } else {
+    return ''
+  }
+}

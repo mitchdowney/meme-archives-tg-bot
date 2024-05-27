@@ -7,11 +7,12 @@ const cors = require('cors')
 import * as express from 'express'
 import { NextFunction, Request, Response } from 'express'
 import { HttpError } from 'http-errors'
-import { getAvailableImageUrl, getImageInfo } from './lib/galleryHelpers'
+import { getArtistProfilePictureUrl, getAvailableImageUrl, getImageInfo } from './lib/galleryHelpers'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
-import { galleryEditImage, galleryGetImage, galleryUploadImage } from './services/galleryAPI'
-import { getReplyToImageFile, getUserMention, parseEditImageCommand, parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
+import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryUploadImage } from './services/galleryAPI'
+import { getReplyToImageFile, getUserMention, parseEditArtistCommand, parseEditImageCommand,
+  parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
 import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
 import { config } from './config'
 
@@ -71,6 +72,7 @@ const startApp = async () => {
             '/get_image_meta': webhookHandlers.getImageMeta,
             '/upload_image': webhookHandlers.uploadImage,
             '/edit_image': webhookHandlers.editImage,
+            '/edit_artist': webhookHandlers.editArtist,
             '/gallery_standards': webhookHandlers.galleryStandards
           }
           
@@ -84,7 +86,8 @@ const startApp = async () => {
           const callbackDataHandlers = {
             'get_image_prompt': webhookHandlers.getImagePrompt,
             'upload_image_prompt': webhookHandlers.uploadImagePrompt,
-            'upload_edit_prompt': webhookHandlers.editImagePrompt,
+            'edit_image_prompt': webhookHandlers.editImagePrompt,
+            'edit_artist_prompt': webhookHandlers.editArtistPrompt            
           }
         
           const handler = callbackDataHandlers[callbackDataObject.callback_data]
@@ -167,6 +170,15 @@ const webhookHandlers = {
       { parse_mode: 'Markdown' }
     )
   },
+  editArtistPrompt: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const chat_id = req?.body?.callback_query?.message?.chat?.id
+    await sendMessage(
+      chat_id, 
+      'EDIT: type \`/edit_artist\` with the following required parameter:\n-i id-or-slug\noptional parameters:\n-n name\n-s url-slug\n-deca deca username\n-foundation foundation username\n-instagram instagram username\n-superrare superrare username\n-twitter twitter username\nreply to a file or image to change the profile picture',
+      { parse_mode: 'Markdown' }
+    )
+  },
   getImage: async (req: Request) => {
     const commandText = req?.body?.message?.text
     const chat_id = req?.body?.message?.chat?.id
@@ -241,6 +253,39 @@ const webhookHandlers = {
     })
 
     const imageUrl = getAvailableImageUrl('no-border', image)
+    const text = getImageInfo(image)
+    if (imageUrl) {
+      await sendImage(chat_id, imageUrl, text)
+    } else {
+      await sendMessage(chat_id, text)
+    }
+  },
+  editArtist: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const commandText = req?.body?.message?.text
+    const chat_id = req?.body?.message?.chat?.id
+    const parsedCommand = parseEditArtistCommand(commandText)
+    const imageUploadData = await getReplyToImageFile(req)
+  
+    const { id: idOrSlug, name, slug, deca_username, foundation_username,
+      instagram_username, superrare_username, twitter_username
+    } = parsedCommand
+    
+    const previousArtistData = await galleryGetArtist(idOrSlug)
+
+    const image = await galleryEditArtist(previousArtistData.id, {
+      ...previousArtistData,
+      ...(name ? { name } : {}),
+      ...(slug ? { slug } : {}),
+      ...(deca_username ? { deca_username } : {}),
+      ...(foundation_username ? { foundation_username } : {}),
+      ...(instagram_username ? { instagram_username } : {}),
+      ...(superrare_username ? { superrare_username } : {}),
+      ...(twitter_username ? { twitter_username } : {}),
+      imageUploadData
+    })
+
+    const imageUrl = getArtistProfilePictureUrl(previousArtistData.id, 'original')
     const text = getImageInfo(image)
     if (imageUrl) {
       await sendImage(chat_id, imageUrl, text)

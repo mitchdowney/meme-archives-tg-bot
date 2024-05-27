@@ -118,9 +118,10 @@ export const sendGalleryAdmin = async (chat_id: string) => {
         reply_markup: JSON.stringify({
           inline_keyboard: [
             [
-              { text: 'Get', callback_data: generateCallbackData('get_image_prompt') },
-              { text: 'Upload', callback_data: generateCallbackData('upload_image_prompt') },
-              { text: 'Edit', callback_data: generateCallbackData('upload_edit_prompt') }
+              { text: 'Get Image', callback_data: generateCallbackData('get_image_prompt') },
+              { text: 'Upload Image', callback_data: generateCallbackData('upload_image_prompt') },
+              { text: 'Edit Image', callback_data: generateCallbackData('edit_image_prompt') },
+              { text: 'Edit Artist', callback_data: generateCallbackData('edit_artist_prompt') }
             ]
           ]
         })
@@ -266,6 +267,21 @@ export const parseEditImageCommand = createCommandParser(
         .filter(Boolean)
     },
     s: (value, acc) => { acc.slug = value },
+  },
+  ['id']
+)
+
+export const parseEditArtistCommand = createCommandParser(
+  '/edit_artist',
+  {
+    i: (value, acc) => { acc.id = value },
+    n: (value, acc) => { acc.name = value },
+    s: (value, acc) => { acc.slug = value },
+    deca: (value, acc) => { acc.deca_username = value },
+    foundation: (value, acc) => { acc.foundation_username = value },
+    instagram: (value, acc) => { acc.instagram_username = value },
+    superrare: (value, acc) => { acc.superrare_username = value },
+    twitter: (value, acc) => { acc.twitter_username = value }
   },
   ['id']
 )
