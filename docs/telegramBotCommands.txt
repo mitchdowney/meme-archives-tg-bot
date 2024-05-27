@@ -6,5 +6,6 @@ gallery_admin - Get started with the gallery
 upload_image - Upload image to gallery
 edit_image - Edit image in gallery
 edit_artist - Edit artist in gallery
+
 gallery_hello - Send a test message in gallery
 gallery_standards - Show gallery standards guide
