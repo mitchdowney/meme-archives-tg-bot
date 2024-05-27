@@ -285,7 +285,7 @@ const webhookHandlers = {
       imageUploadData
     })
 
-    const newArtistData = await galleryGetArtist(idOrSlug)
+    const newArtistData = await galleryGetArtist(previousArtistData.id)
 
     const imageUrl = getArtistProfilePictureUrl(previousArtistData.id, 'original')
     const text = getArtistInfo(newArtistData)
