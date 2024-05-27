@@ -73,7 +73,7 @@ const createImageFormData = (data: GalleryUploadImage, id?: number) => {
 
   const formData = new FormData()
   for (const key in filteredData) {
-    if (filteredData[key] || filteredData[key] === '' || filteredData[key] === null) {
+    if (filteredData[key] || filteredData[key] === '') {
       formData.append(key, filteredData[key])
     }
   }
@@ -154,7 +154,7 @@ const updateArtistFormData = (data: GalleryUpdateArtist, id: number) => {
 
   const formData = new FormData()
   for (const key in filteredData) {
-    if (filteredData[key] || filteredData[key] === '' || filteredData[key] === null) {
+    if (filteredData[key] || filteredData[key] === '') {
       formData.append(key, filteredData[key])
     }
   }
