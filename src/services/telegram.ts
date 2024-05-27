@@ -294,3 +294,7 @@ export const parseEditArtistCommand = createCommandParser(
   },
   ['id']
 )
+
+export const getCommandText = (req: Request) => {
+  return req?.body?.message?.text || req?.body?.caption?.text
+}
