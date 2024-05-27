@@ -66,6 +66,7 @@ const startApp = async () => {
         const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
         if (commandText) {
           const commands = {
+            '/how_daumen_am_i': webhookHandlers.howDaumenAmI,
             '/gallery_hello': webhookHandlers.galleryHello,
             '/gallery_admin': webhookHandlers.galleryAdmin,
             '/get_image': webhookHandlers.getImage,
@@ -131,6 +132,14 @@ const startApp = async () => {
 })()
 
 const webhookHandlers = {
+  howDaumenAmI: async (req: Request) => {
+    const chat_id = req?.body?.message?.chat?.id
+    const first_name = req?.body?.message?.from?.first_name
+    const username = req?.body?.message?.from?.username
+    const randomPercent = Math.floor(Math.random() * 101) + '%'
+    const text = `${first_name || username || ''} is ${randomPercent} daumen!`
+    await sendMessage(chat_id, text)
+  },
   galleryHello: async (req: Request) => {
     const chat_id = req?.body?.message?.chat?.id
     const username = req?.body?.message?.from?.username

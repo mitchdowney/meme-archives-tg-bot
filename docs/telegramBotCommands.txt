@@ -1,5 +1,6 @@
 These can get set with the BotFather:
 
+how_daumen_am_i - How Daumen are you?
 get_image - Get an image from the gallery by id or slug
 get_image_meta - Get full image info from the gallery by id or slug
 gallery_admin - Get started with the gallery
