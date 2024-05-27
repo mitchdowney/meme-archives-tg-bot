@@ -166,7 +166,6 @@ const webhookHandlers = {
     )
   },
   getImage: async (req: Request) => {
-    await checkIsGroupAdmin(req)
     const commandText = req?.body?.message?.text
     const chat_id = req?.body?.message?.chat?.id
     const imageId = commandText.split(' ')[1]
