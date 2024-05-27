@@ -273,7 +273,7 @@ const webhookHandlers = {
     
     const previousArtistData = await galleryGetArtist(idOrSlug)
 
-    const artist = await galleryEditArtist(previousArtistData.id, {
+    await galleryEditArtist(previousArtistData.id, {
       ...previousArtistData,
       ...(name ? { name } : {}),
       ...(slug ? { slug } : {}),
@@ -285,8 +285,10 @@ const webhookHandlers = {
       imageUploadData
     })
 
+    const newArtistData = await galleryGetArtist(idOrSlug)
+
     const imageUrl = getArtistProfilePictureUrl(previousArtistData.id, 'original')
-    const text = getArtistInfo(artist)
+    const text = getArtistInfo(newArtistData)
     if (imageUrl) {
       await sendImage(chat_id, imageUrl, text)
     } else {
