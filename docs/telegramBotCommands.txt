@@ -9,3 +9,5 @@ edit_image - Edit image in gallery
 edit_artist - Edit artist in gallery
 gallery_hello - Send a test message in gallery
 gallery_standards - Show gallery standards guide
+
+daumen custom emoji id = 6176782546450255832
