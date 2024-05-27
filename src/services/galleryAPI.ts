@@ -37,11 +37,11 @@ export const galleryGetImage = async (imageId: string) => {
 }
 
 type GalleryUploadImage = {
-  title: string
-  tagTitles: string
-  artistNames: string
-  slug: string
-  imageUploadData: {
+  title?: string
+  tagTitles?: string
+  artistNames?: string
+  slug?: string
+  imageUploadData?: {
     filename: string
     buffer: Buffer
   }
@@ -112,6 +112,69 @@ export const galleryEditImage = async (id: number, data: GalleryUploadImage) => 
   const formData = createImageFormData(data, id)
 
   const response = await galleryAPIAdminRequest('POST', '/image/update', {
+    headers: {
+      ...formData.getHeaders()
+    },
+    data: formData
+  })
+
+  return response.data
+}
+
+export const galleryGetArtist = async (artistId: string) => {
+  const response = await galleryAPIRequest('GET', `/artist/${artistId}`)
+  return response.data
+}
+
+type GalleryUpdateArtist = {
+  name?: string
+  slug?: string
+  deca_username?: string
+  foundation_username?: string
+  instagram_username?: string
+  superrare_username?: string
+  twitter_username?: string
+  imageUploadData?: {
+    filename: string
+    buffer: Buffer
+  }
+}
+
+const updateArtistFormData = (data: GalleryUpdateArtist, id: number) => {
+  const filteredData = {
+    id,
+    name: data.name,
+    slug: data.slug,
+    deca_username: data.deca_username,
+    foundation_username: data.foundation_username,
+    instagram_username: data.instagram_username,
+    superrare_username: data.superrare_username,
+    twitter_username: data.twitter_username
+  }
+
+  const formData = new FormData()
+  for (const key in filteredData) {
+    if (filteredData[key] || filteredData[key] === '' || filteredData[key] === null) {
+      formData.append(key, filteredData[key])
+    }
+  }
+
+  const contentType = getContentTypeFromFilename(data.imageUploadData.filename)
+
+  if (contentType === 'image/png' || contentType === 'image/jpeg') {
+    formData.append('fileArtistProfilePictures', data.imageUploadData.buffer, {
+      filename: data.imageUploadData.filename,
+      contentType
+    })
+  }
+
+  return formData
+}
+
+export const galleryEditArtist = async (id: number, data: GalleryUpdateArtist) => {  
+  const formData = updateArtistFormData(data, id)
+
+  const response = await galleryAPIAdminRequest('POST', '/artist/update', {
     headers: {
       ...formData.getHeaders()
     },
