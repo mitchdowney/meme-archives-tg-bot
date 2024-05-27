@@ -71,6 +71,7 @@ const startApp = async () => {
             '/get_image_meta': webhookHandlers.getImageMeta,
             '/upload_image': webhookHandlers.uploadImage,
             '/edit_image': webhookHandlers.editImage,
+            '/gallery_standards': webhookHandlers.galleryStandards
           }
           
           for (const [command, handler] of Object.entries(commands)) {
@@ -246,5 +247,11 @@ const webhookHandlers = {
     } else {
       await sendMessage(chat_id, text)
     }
-  }
+  },
+  galleryStandards: async (req: Request) => {
+    const chat_id = req?.body?.message?.chat?.id
+    // eslint-disable-next-line quotes
+    const text = `Try to make image titles and tags as intuitive for searching as possible.\nTry to reuse existing tag names.\nSearch the gallery to make sure the image your uploading isn't there already.\nIf an image is a profile picture, use the \"pfp\" tag.\nUse capitalization for titles like a book title (lowercase articles), unless you think it should be an exception.`
+    await sendMessage(chat_id, text)
+  },
 }
