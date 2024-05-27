@@ -68,6 +68,7 @@ const startApp = async () => {
             '/gallery_hello': webhookHandlers.galleryHello,
             '/gallery_admin': webhookHandlers.galleryAdmin,
             '/get_image': webhookHandlers.getImage,
+            '/get_image_meta': webhookHandlers.getImageMeta,
             '/upload_image': webhookHandlers.uploadImage,
             '/edit_image': webhookHandlers.editImage,
           }
@@ -143,7 +144,7 @@ const webhookHandlers = {
     const chat_id = req?.body?.callback_query?.message?.chat?.id
     await sendMessage(
       chat_id, 
-      'GET: type \`/get_image\` followed by the image id or slug',
+      'GET: type \`/get_image\` followed by the image id or slug. use \`/get_image_meta\` for full info',
       { parse_mode: 'Markdown' }
     )
   },
@@ -166,6 +167,18 @@ const webhookHandlers = {
     )
   },
   getImage: async (req: Request) => {
+    const commandText = req?.body?.message?.text
+    const chat_id = req?.body?.message?.chat?.id
+    const imageId = commandText.split(' ')[1]
+    const image = await galleryGetImage(imageId)
+    const imageUrl = getAvailableImageUrl('no-border', image)
+    if (imageUrl) {
+      await sendImage(chat_id, imageUrl)
+    } else {
+      await sendMessage(chat_id, 'Image not found')
+    }
+  },
+  getImageMeta: async (req: Request) => {
     const commandText = req?.body?.message?.text
     const chat_id = req?.body?.message?.chat?.id
     const imageId = commandText.split(' ')[1]
