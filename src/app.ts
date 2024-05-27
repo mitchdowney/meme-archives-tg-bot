@@ -68,8 +68,8 @@ const startApp = async () => {
           const commands = {
             '/gallery_hello': webhookHandlers.galleryHello,
             '/gallery_admin': webhookHandlers.galleryAdmin,
-            '/get_image': webhookHandlers.getImage,
             '/get_image_meta': webhookHandlers.getImageMeta,
+            '/get_image': webhookHandlers.getImage,
             '/upload_image': webhookHandlers.uploadImage,
             '/edit_image': webhookHandlers.editImage,
             '/edit_artist': webhookHandlers.editArtist,
