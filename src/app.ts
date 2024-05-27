@@ -11,7 +11,7 @@ import { getArtistInfo, getArtistProfilePictureUrl, getAvailableImageUrl, getIma
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
 import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryUploadImage } from './services/galleryAPI'
-import { getImageFile, getUserMention, parseEditArtistCommand, parseEditImageCommand,
+import { getCommandText, getImageFile, getUserMention, parseEditArtistCommand, parseEditImageCommand,
   parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
 import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
 import { config } from './config'
@@ -62,7 +62,7 @@ const startApp = async () => {
     checkIsAllowedChat,
     async function (req: Request, res: Response, next: NextFunction) {
       try {
-        const commandText = req?.body?.message?.text
+        const commandText = getCommandText(req)
         const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
         if (commandText) {
           const commands = {
@@ -180,7 +180,7 @@ const webhookHandlers = {
     )
   },
   getImage: async (req: Request) => {
-    const commandText = req?.body?.message?.text
+    const commandText = getCommandText(req)
     const chat_id = req?.body?.message?.chat?.id
     const imageId = commandText.split(' ')[1]
     const image = await galleryGetImage(imageId)
@@ -192,7 +192,7 @@ const webhookHandlers = {
     }
   },
   getImageMeta: async (req: Request) => {
-    const commandText = req?.body?.message?.text
+    const commandText = getCommandText(req)
     const chat_id = req?.body?.message?.chat?.id
     const imageId = commandText.split(' ')[1]
     const image = await galleryGetImage(imageId)
@@ -206,7 +206,7 @@ const webhookHandlers = {
   },
   uploadImage: async (req: Request) => {
     await checkIsGroupAdmin(req)
-    const commandText = req?.body?.message?.text
+    const commandText = getCommandText(req)
     const chat_id = req?.body?.message?.chat?.id
     const parsedCommand = parseUploadImageCommand(commandText)
     const imageUploadData = await getImageFile(req)
@@ -231,7 +231,7 @@ const webhookHandlers = {
   },
   editImage: async (req: Request) => {
     await checkIsGroupAdmin(req)
-    const commandText = req?.body?.message?.text
+    const commandText = getCommandText(req)
     const chat_id = req?.body?.message?.chat?.id
     const parsedCommand = parseEditImageCommand(commandText)
     const imageUploadData = await getImageFile(req)
@@ -262,7 +262,7 @@ const webhookHandlers = {
   },
   editArtist: async (req: Request) => {
     await checkIsGroupAdmin(req)
-    const commandText = req?.body?.message?.text
+    const commandText = getCommandText(req)
     const chat_id = req?.body?.message?.chat?.id
     const parsedCommand = parseEditArtistCommand(commandText)
     const imageUploadData = await getImageFile(req)
