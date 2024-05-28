@@ -10,7 +10,7 @@ import { HttpError } from 'http-errors'
 import { getArtistInfo, getArtistProfilePictureUrl, getAvailableImageUrl, getImageInfo } from './lib/galleryHelpers'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
-import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryUploadImage } from './services/galleryAPI'
+import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetRandomImage, galleryUploadImage } from './services/galleryAPI'
 import { getCommandText, getImageFile, getUserMention, parseEditArtistCommand, parseEditImageCommand,
   parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
 import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
@@ -69,11 +69,16 @@ const startApp = async () => {
             '/how_daumen_am_i': webhookHandlers.howDaumenAmI,
             '/gallery_hello': webhookHandlers.galleryHello,
             '/gallery_admin': webhookHandlers.galleryAdmin,
+            '/random_image': webhookHandlers.getRandomImage,
+            '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
             '/get_image_meta': webhookHandlers.getImageMeta,
             '/get_image': webhookHandlers.getImage,
             '/upload_image': webhookHandlers.uploadImage,
+            '/ui': webhookHandlers.uploadImage,
             '/edit_image': webhookHandlers.editImage,
+            '/ei': webhookHandlers.editImage,
             '/edit_artist': webhookHandlers.editArtist,
+            '/ea': webhookHandlers.editArtist,
             '/gallery_standards': webhookHandlers.galleryStandards
           }
           
@@ -205,6 +210,31 @@ const webhookHandlers = {
     const chat_id = req?.body?.message?.chat?.id
     const imageId = commandText.split(' ')[1]
     const image = await galleryGetImage(imageId)
+    const imageUrl = getAvailableImageUrl('no-border', image)
+    const text = getImageInfo(image)
+    if (imageUrl) {
+      await sendImage(chat_id, imageUrl, text)
+    } else {
+      await sendMessage(chat_id, text)
+    }
+  },
+  getRandomImage: async (req: Request) => {
+    const commandText = getCommandText(req)
+    const chat_id = req?.body?.message?.chat?.id
+    const title = commandText.split(' ')[1]
+    const image = await galleryGetRandomImage(title)
+    const imageUrl = getAvailableImageUrl('no-border', image)
+    if (imageUrl) {
+      await sendImage(chat_id, imageUrl)
+    } else {
+      await sendMessage(chat_id, 'Image not found')
+    }
+  },
+  getRandomImageMeta: async (req: Request) => {
+    const commandText = getCommandText(req)
+    const chat_id = req?.body?.message?.chat?.id
+    const title = commandText.split(' ')[1]
+    const image = await galleryGetRandomImage(title)
     const imageUrl = getAvailableImageUrl('no-border', image)
     const text = getImageInfo(image)
     if (imageUrl) {
