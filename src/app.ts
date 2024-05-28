@@ -73,8 +73,11 @@ const startApp = async () => {
             '/get_image_meta': webhookHandlers.getImageMeta,
             '/get_image': webhookHandlers.getImage,
             '/upload_image': webhookHandlers.uploadImage,
+            '/ui': webhookHandlers.uploadImage,
             '/edit_image': webhookHandlers.editImage,
+            '/ei': webhookHandlers.editImage,
             '/edit_artist': webhookHandlers.editArtist,
+            '/ea': webhookHandlers.editArtist,
             '/gallery_standards': webhookHandlers.galleryStandards
           }
           
