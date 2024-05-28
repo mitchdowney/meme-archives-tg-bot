@@ -212,8 +212,8 @@ const webhookHandlers = {
   getRandomImage: async (req: Request) => {
     const commandText = getCommandText(req)
     const chat_id = req?.body?.message?.chat?.id
-    const imageId = commandText.split(' ')[1]
-    const image = await galleryGetRandomImage(imageId)
+    const title = commandText.split(' ')[1]
+    const image = await galleryGetRandomImage(title)
     const imageUrl = getAvailableImageUrl('no-border', image)
     if (imageUrl) {
       await sendImage(chat_id, imageUrl)
@@ -224,8 +224,8 @@ const webhookHandlers = {
   getRandomImageMeta: async (req: Request) => {
     const commandText = getCommandText(req)
     const chat_id = req?.body?.message?.chat?.id
-    const imageId = commandText.split(' ')[1]
-    const image = await galleryGetRandomImage(imageId)
+    const title = commandText.split(' ')[1]
+    const image = await galleryGetRandomImage(title)
     const imageUrl = getAvailableImageUrl('no-border', image)
     const text = getImageInfo(image)
     if (imageUrl) {
