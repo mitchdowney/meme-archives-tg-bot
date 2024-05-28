@@ -36,6 +36,19 @@ export const galleryGetImage = async (imageId: string) => {
   return response.data
 }
 
+export const galleryGetRandomImage = async (title?: string) => {
+  const response = await galleryAPIRequest(
+    'GET', 
+    '/image/get-one-random',
+    {
+      params: {
+        ...(title ? { title } : {})
+      }
+    }
+  )
+  return response.data
+}
+
 type GalleryUploadImage = {
   title?: string
   tagTitles?: string
