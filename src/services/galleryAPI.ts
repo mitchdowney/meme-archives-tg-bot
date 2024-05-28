@@ -91,18 +91,20 @@ const createImageFormData = (data: GalleryUploadImage, id?: number) => {
     }
   }
 
-  const contentType = getContentTypeFromFilename(data.imageUploadData.filename)
-
-  if (contentType === 'image/gif') {
-    formData.append('fileImageAnimations', data.imageUploadData.buffer, {
-      filename: data.imageUploadData.filename,
-      contentType
-    })
-  } else if (contentType === 'image/png' || contentType === 'image/jpeg') {
-    formData.append('fileImageNoBorders', data.imageUploadData.buffer, {
-      filename: data.imageUploadData.filename,
-      contentType
-    })
+  if (data?.imageUploadData?.filename && data?.imageUploadData?.buffer) {
+    const contentType = getContentTypeFromFilename(data?.imageUploadData?.filename)
+  
+    if (contentType === 'image/gif') {
+      formData.append('fileImageAnimations', data.imageUploadData.buffer, {
+        filename: data.imageUploadData.filename,
+        contentType
+      })
+    } else if (contentType === 'image/png' || contentType === 'image/jpeg') {
+      formData.append('fileImageNoBorders', data.imageUploadData.buffer, {
+        filename: data.imageUploadData.filename,
+        contentType
+      })
+    }
   }
 
   return formData
@@ -177,13 +179,15 @@ const updateArtistFormData = (data: GalleryUpdateArtist, id: number) => {
     }
   }
 
-  const contentType = getContentTypeFromFilename(data.imageUploadData.filename)
-
-  if (contentType === 'image/png' || contentType === 'image/jpeg') {
-    formData.append('fileArtistProfilePictures', data.imageUploadData.buffer, {
-      filename: data.imageUploadData.filename,
-      contentType
-    })
+  if (data?.imageUploadData?.filename && data?.imageUploadData?.buffer) {
+    const contentType = getContentTypeFromFilename(data.imageUploadData.filename)
+  
+    if (contentType === 'image/png' || contentType === 'image/jpeg') {
+      formData.append('fileArtistProfilePictures', data.imageUploadData.buffer, {
+        filename: data.imageUploadData.filename,
+        contentType
+      })
+    }
   }
 
   return formData
