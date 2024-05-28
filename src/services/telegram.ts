@@ -191,7 +191,7 @@ export const getImageFile = async (req: Request) => {
 }
 
 export const createCommandParser = (
-  commandPrefix: string,
+  commandPrefixes: string[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   keyHandlers: { [key: string]: (value: string, acc: any) => void },
   requiredKeys: string[]
@@ -201,7 +201,7 @@ export const createCommandParser = (
   }
 
   return (commandText: string) => {
-    if (!commandText.startsWith(commandPrefix)) {
+    if (!commandPrefixes.some(prefix => commandText.startsWith(prefix) && commandText[prefix.length] === ' ')) {
       throw new Error('Invalid command')
     }
 
@@ -236,7 +236,7 @@ export const createCommandParser = (
 }
 
 export const parseUploadImageCommand = createCommandParser(
-  '/upload_image',
+  ['/upload_image', '/ui'],
   {
     t: (value, acc) => { acc.title = value },
     ts: (value, acc) => {
@@ -258,7 +258,7 @@ export const parseUploadImageCommand = createCommandParser(
 )
 
 export const parseEditImageCommand = createCommandParser(
-  '/edit_image',
+  ['/edit_image', '/ei'],
   {
     i: (value, acc) => { acc.id = value },
     t: (value, acc) => { acc.title = value },
@@ -281,7 +281,7 @@ export const parseEditImageCommand = createCommandParser(
 )
 
 export const parseEditArtistCommand = createCommandParser(
-  '/edit_artist',
+  ['/edit_artist', '/ea'],
   {
     i: (value, acc) => { acc.id = value },
     n: (value, acc) => { acc.name = value },
