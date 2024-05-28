@@ -13,10 +13,16 @@ import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
 import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetRandomImage, galleryUploadImage } from './services/galleryAPI'
 import { getCommandText, getImageFile, getUserMention, parseEditArtistCommand, parseEditImageCommand,
   parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
-import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
+import { checkIsAllowedChat, getChatId } from './middleware/checkIsAllowedChat'
 import { config } from './config'
+import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes, updateTagCommandsIndex } from './services/memesIndex'
 
 const port = 9000
+
+/*
+  On startup, initialize the tagCommandsIndex for each group chat.
+*/
+initializeTagsCommandsIndexes()
 
 const startApp = async () => {
 
@@ -88,6 +94,23 @@ const startApp = async () => {
               break
             }
           }
+
+          /*
+            If none of those test true, then check if the command has a matching tag title in the gallery.
+            If it does, return a random meme for that tag.
+          */
+          const groupChatId = getChatId(req)
+          const tagCommandsIndexMatchingTitle = getMatchingTagTitleFromTagCommandsIndex(groupChatId, commandText)
+          if (tagCommandsIndexMatchingTitle) {
+            const image = await galleryGetRandomImage(tagCommandsIndexMatchingTitle)
+            const imageUrl = getAvailableImageUrl('no-border', image)
+            if (imageUrl) {
+              await sendImage(groupChatId, imageUrl)
+            } else {
+              await sendMessage(groupChatId, 'Image not found')
+            }
+          }
+
         } else if (callbackDataObject?.callback_data) {
           const callbackDataHandlers = {
             'get_image_prompt': webhookHandlers.getImagePrompt,
@@ -115,7 +138,7 @@ const startApp = async () => {
       console.error(error)
     }
 
-    const chat_id = req?.body?.message?.chat?.id || req?.body?.callback_query?.message?.chat?.id
+    const chat_id = getChatId(req)
     const errorMessage = error?.response?.data?.message || error?.message
 
     if (chat_id && errorMessage) {
@@ -259,6 +282,8 @@ const webhookHandlers = {
     } else {
       await sendMessage(chat_id, text)
     }
+
+    updateTagCommandsIndex(chat_id)
   },
   editImage: async (req: Request) => {
     await checkIsGroupAdmin(req)
@@ -290,6 +315,8 @@ const webhookHandlers = {
     } else {
       await sendMessage(chat_id, text)
     }
+
+    updateTagCommandsIndex(chat_id)
   },
   editArtist: async (req: Request) => {
     await checkIsGroupAdmin(req)
@@ -325,6 +352,8 @@ const webhookHandlers = {
     } else {
       await sendMessage(chat_id, text)
     }
+
+    updateTagCommandsIndex(chat_id)
   },
   galleryStandards: async (req: Request) => {
     const chat_id = req?.body?.message?.chat?.id
