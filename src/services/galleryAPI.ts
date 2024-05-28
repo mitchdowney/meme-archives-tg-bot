@@ -139,6 +139,11 @@ export const galleryGetArtist = async (artistId: string) => {
   return response.data
 }
 
+export const galleryGetAllTagsWithImages = async () => {
+  const response = await galleryAPIRequest('GET', '/tags/all-with-images')
+  return response.data
+}
+
 type GalleryUpdateArtist = {
   name?: string
   slug?: string
