@@ -69,6 +69,7 @@ const startApp = async () => {
             '/how_daumen_am_i': webhookHandlers.howDaumenAmI,
             '/gallery_hello': webhookHandlers.galleryHello,
             '/gallery_admin': webhookHandlers.galleryAdmin,
+            '/meme': webhookHandlers.getRandomImage,
             '/random_image': webhookHandlers.getRandomImage,
             '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
             '/get_image_meta': webhookHandlers.getImageMeta,
