@@ -54,10 +54,10 @@ type GalleryUploadImage = {
   tagTitles?: string
   artistNames?: string
   slug?: string
-  imageUploadData?: {
+  imageUploadData: {
     filename: string
     buffer: Buffer
-  }
+  } | null
 }
 
 const getContentTypeFromFilename = (filename: string) => {
@@ -152,10 +152,10 @@ type GalleryUpdateArtist = {
   instagram_username?: string
   superrare_username?: string
   twitter_username?: string
-  imageUploadData?: {
+  imageUploadData: {
     filename: string
     buffer: Buffer
-  }
+  } | null
 }
 
 const updateArtistFormData = (data: GalleryUpdateArtist, id: number) => {
