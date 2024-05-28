@@ -4,8 +4,10 @@ import { galleryGetAllTagsWithImages } from './galleryAPI'
 const tagsCommandsIndexes = {}
 
 export const initializeTagsCommandsIndexes = async () => {
-  for (const groupChatId of config.BOT_APP_ALLOWED_GROUP_CHAT_IDS) {
-    await updateTagCommandsIndex(groupChatId)
+  if (config.BOT_APP_ALLOWED_GROUP_CHAT_IDS) {
+    for (const groupChatId of config.BOT_APP_ALLOWED_GROUP_CHAT_IDS) {
+      await updateTagCommandsIndex(groupChatId)
+    }
   }
 }
 

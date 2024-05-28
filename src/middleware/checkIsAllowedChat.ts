@@ -6,7 +6,7 @@ export const checkIsAllowedChat = (req, res, next) => {
     next()
   } else {
     const chat_id = getChatId(req)
-    if (chat_id && config.BOT_APP_ALLOWED_GROUP_CHAT_IDS.includes(chat_id)) {
+    if (chat_id && config.BOT_APP_ALLOWED_GROUP_CHAT_IDS && config.BOT_APP_ALLOWED_GROUP_CHAT_IDS.includes(chat_id)) {
       next()
     } else {
       throw new Forbidden('Permission denied. Invalid chat id.')
