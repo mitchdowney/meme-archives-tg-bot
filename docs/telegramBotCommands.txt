@@ -1,20 +1,20 @@
 These can get set with the BotFather:
 
-meme - Get a random meme
-how_daumen_am_i - How Daumen are you?
-get_image - Get an image from the gallery by id or slug
-get_image_meta - Get full image info from the gallery by id or slug
-random_image - Get a random image from the gallery by title
-random_image_meta - Get full random image info from the gallery by title
-gallery_admin - Get started with the gallery
-upload_image - Upload image to gallery
-edit_image - Edit image in gallery
-edit_artist - Edit artist in gallery
-ui - same as upload_image
-ei - same as edit_image
-ea - same as edit_artist
+meme - get a random meme
+how_daumen_am_i - How daumen are you?
+get_image - get image from gallery
+get_image_meta - get image info from gallery
+random_image - get random image from gallery
+random_image_meta - get random image info from gallery
+gallery_admin - gallery admin panel
+upload_image - upload image to gallery
+edit_image - edit image in gallery
+edit_artist - edit artist in gallery
+ui - alias upload_image
+ei - alias edit_image
+ea - alias as edit_artist
 
-gallery_hello - Send a test message in gallery
-gallery_standards - Show gallery standards guide
+gallery_hello - send a test message
+gallery_naming - show naming guide
 
 daumen custom emoji id = 6176782546450255832
