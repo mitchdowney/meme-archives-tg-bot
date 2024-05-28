@@ -21,18 +21,11 @@ export const updateTagCommandsIndex = async (groupChatId: number) => {
 }
 
 export const getMatchingTagTitleFromTagCommandsIndex = (groupChatId: number, commandText: string) => {
-  console.log('tagsCommandsIndexes', tagsCommandsIndexes)
-  console.log('groupChatId', groupChatId)
-  console.log('commandText', commandText)
   const commandPrefix = commandText.split(' ')[0]
-  console.log('commandPrefix', commandPrefix)
   if (commandPrefix.startsWith('/')) {
-    const parsedCommand = commandPrefix.substring(1)
-    console.log('parsedCommand', parsedCommand)
     const tagsCommandsIndex = tagsCommandsIndexes[groupChatId]
-    console.log('tagsCommandsIndex', tagsCommandsIndex)
+    const parsedCommand = commandPrefix.substring(1)?.toLowerCase()
     const tagTitle = tagsCommandsIndex[parsedCommand]
-    console.log('tagTitle', tagTitle)
     return tagTitle
   }
 }
