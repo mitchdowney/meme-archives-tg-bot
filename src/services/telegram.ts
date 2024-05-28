@@ -138,9 +138,14 @@ export const getUserMention = (username = '', userId = '') => {
   return username
     ? `@${username}`
     : `[${userId}](tg://user?id=${userId})`
-} 
+}
 
-export const getImageFile = async (req: Request) => {
+type ImageFile = {
+  filename: string
+  buffer: Buffer
+} | null
+
+export const getImageFile = async (req: Request): Promise<ImageFile> => {
   const originalMessage = req?.body?.message
   const replyToMessage = originalMessage?.reply_to_message
   let fileId = null
@@ -169,7 +174,7 @@ export const getImageFile = async (req: Request) => {
   }
 
   if (fileId === null) {
-    throw new Error('Image attachment not found')
+    return null
   }
 
   const response = await telegramAPIRequest('getFile', {
