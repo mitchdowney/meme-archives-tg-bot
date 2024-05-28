@@ -1,7 +1,7 @@
 These can get set with the BotFather:
 
 meme - get a random meme
-how_daumen_am_i - How daumen are you?
+how_daumen_am_i - how daumen are you?
 get_image - get image from gallery
 get_image_meta - get image info from gallery
 random_image - get random image from gallery
