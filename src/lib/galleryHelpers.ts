@@ -31,13 +31,15 @@ export const getImageUrl = (id: number, imageVersion: ImageVersion) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getAvailableImageVersion = (origVersion: ImageVersion | null, image: any) => {
-  if (origVersion === 'animation' && image.has_animation) {
+  if (image.has_video) {
+    return 'preview'
+  } else if (origVersion === 'animation' && image.has_animation) {
     return 'animation'
   } else if (origVersion === 'border' && image.has_border) {
     return 'border'
   } else if (origVersion === 'no-border' && image.has_no_border) {
     return 'no-border'
-  } else if (origVersion === 'preview' || origVersion === 'video') {
+  } else if (origVersion === 'preview') {
     return 'preview'
   } else {
     return image.has_border
