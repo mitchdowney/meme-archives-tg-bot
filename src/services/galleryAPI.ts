@@ -62,7 +62,9 @@ type GalleryUploadImage = {
 
 const getContentTypeFromFilename = (filename: string) => {
   const extension = filename.split('.').pop()?.toLowerCase()
-  if (extension === 'png') {
+  if (extension === 'mp4') {
+    return 'video/mp4'
+  } else if (extension === 'png') {
     return 'image/png'
   } else if (extension === 'jpg' || extension === 'jpeg') {
     return 'image/jpeg'
@@ -101,6 +103,11 @@ const createImageFormData = (data: GalleryUploadImage, id?: number) => {
       })
     } else if (contentType === 'image/png' || contentType === 'image/jpeg') {
       formData.append('fileImageNoBorders', data.imageUploadData.buffer, {
+        filename: data.imageUploadData.filename,
+        contentType
+      })
+    } else if (contentType === 'video/mp4') {
+      formData.append('fileImageVideos', data.imageUploadData.buffer, {
         filename: data.imageUploadData.filename,
         contentType
       })
