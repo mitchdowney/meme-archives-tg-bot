@@ -150,25 +150,25 @@ export const getImageFile = async (req: Request): Promise<ImageFile> => {
   const replyToMessage = originalMessage?.reply_to_message
   let fileId = null
 
-  // Check both the original message and the reply message
   const messagesToCheck = [originalMessage, replyToMessage]
 
   for (const message of messagesToCheck) {
     if (message) {
       const photo = message.photo
       const document = message.document
+      const video = message.video
 
       if (photo) {
-        // The photo field is an array of different sizes of the photo.
-        // You can get the file_id of the largest photo like this:
         const largestPhoto = photo[photo.length - 1]
         fileId = largestPhoto.file_id
       }
 
       if (document) {
-        // The document field contains information about the document.
-        // You can get the file_id of the document like this:
         fileId = document.file_id
+      }
+
+      if (video) {
+        fileId = video.file_id
       }
     }
   }
