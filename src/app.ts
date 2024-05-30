@@ -228,7 +228,8 @@ const webhookHandlers = {
     const imageUrl = getAvailableImageUrl('no-border', image)
     const text = getImageInfo(image)
     if (imageUrl) {
-      await sendImage(chat_id, imageUrl, text)
+      const shouldCheckAndRetry = false
+      await sendImage(chat_id, imageUrl, shouldCheckAndRetry, text)
     } else {
       await sendMessage(chat_id, text)
     }
@@ -253,7 +254,8 @@ const webhookHandlers = {
     const imageUrl = getAvailableImageUrl('no-border', image)
     const text = getImageInfo(image)
     if (imageUrl) {
-      await sendImage(chat_id, imageUrl, text)
+      const shouldCheckAndRetry = false
+      await sendImage(chat_id, imageUrl, shouldCheckAndRetry, text)
     } else {
       await sendMessage(chat_id, text)
     }
@@ -278,8 +280,8 @@ const webhookHandlers = {
     const imageUrl = getAvailableImageUrl('no-border', image)
     const text = getImageInfo(image)
     if (imageUrl) {
-      await sleep(1000)
-      await sendImage(chat_id, imageUrl, text)
+      const shouldCheckAndRetry = true
+      await sendImage(chat_id, imageUrl, shouldCheckAndRetry, text)
     } else {
       await sendMessage(chat_id, text)
     }
@@ -312,8 +314,8 @@ const webhookHandlers = {
     const imageUrl = getAvailableImageUrl('no-border', image)
     const text = getImageInfo(image)
     if (imageUrl) {
-      await sleep(1000)
-      await sendImage(chat_id, imageUrl, text)
+      const shouldCheckAndRetry = true
+      await sendImage(chat_id, imageUrl, shouldCheckAndRetry, text)
     } else {
       await sendMessage(chat_id, text)
     }
@@ -350,8 +352,8 @@ const webhookHandlers = {
     const imageUrl = getArtistProfilePictureUrl(previousArtistData.id, 'original')
     const text = getArtistInfo(newArtistData)
     if (imageUrl) {
-      await sleep(1000)
-      await sendImage(chat_id, imageUrl, text)
+      const shouldCheckAndRetry = true
+      await sendImage(chat_id, imageUrl, shouldCheckAndRetry, text)
     } else {
       await sendMessage(chat_id, text)
     }
