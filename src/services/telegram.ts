@@ -80,18 +80,32 @@ export const sendMessage = async (chat_id: string, text: string, options?: SendM
   return response.data
 }
 
-export const sendImage = async (chat_id: string, imageUrl: string,
-  text?: string, options?: SendMessageOptions) => {
-  const response = await telegramAPIRequest('sendPhoto',
-    {
-      params: { 
-        chat_id,
-        photo: `${imageUrl}?random=${Math.floor(Math.random() * 1000) + 1}`,
-        ...(text ? { caption: text } : {}),
-        ...(options ? options : {})
+export const sendImage = async (chat_id: string, imageUrl: string, shouldCheckAndRetry?: boolean, text?: string, options?: SendMessageOptions) => {
+  if (shouldCheckAndRetry) {
+    for (let i = 0; i < 5; i++) {
+      try {
+        const response = await axios.head(`${imageUrl}?random=${Math.floor(Math.random() * 1000) + 1}`)
+        if (response.status === 200) {
+          break
+        }
+      } catch (error) {
+        if (i === 4) {
+          throw new Error('Failed to fetch image URL after 5 attempts')
+        }
+        await sendMessage(chat_id, `Retrying to fetch image URL ${i + 1} of 5...`)
+        await new Promise(resolve => setTimeout(resolve, 3000))
       }
     }
-  )
+  }
+
+  const response = await telegramAPIRequest('sendPhoto', {
+    params: {
+      chat_id,
+      photo: `${imageUrl}?random=${Math.floor(Math.random() * 1000) + 1}`,
+      ...(text ? { caption: text } : {}),
+      ...(options ? options : {})
+    }
+  })
 
   return response.data
 }
