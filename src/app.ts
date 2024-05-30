@@ -7,7 +7,7 @@ const cors = require('cors')
 import * as express from 'express'
 import { NextFunction, Request, Response } from 'express'
 import { HttpError } from 'http-errors'
-import { getArtistInfo, getArtistProfilePictureUrl, getAvailableImageUrl, getImageInfo } from './lib/galleryHelpers'
+import { getArtistInfo, getArtistProfilePictureUrl, getAvailableImageUrl, getImageInfo, sleep } from './lib/galleryHelpers'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
 import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetRandomImage, galleryUploadImage } from './services/galleryAPI'
@@ -287,6 +287,7 @@ const webhookHandlers = {
     const imageUrl = getAvailableImageUrl('no-border', image)
     const text = getImageInfo(image)
     if (imageUrl) {
+      await sleep(1000)
       await sendImage(chat_id, imageUrl, text)
     } else {
       await sendMessage(chat_id, text)
@@ -320,6 +321,7 @@ const webhookHandlers = {
     const imageUrl = getAvailableImageUrl('no-border', image)
     const text = getImageInfo(image)
     if (imageUrl) {
+      await sleep(1000)
       await sendImage(chat_id, imageUrl, text)
     } else {
       await sendMessage(chat_id, text)
@@ -357,6 +359,7 @@ const webhookHandlers = {
     const imageUrl = getArtistProfilePictureUrl(previousArtistData.id, 'original')
     const text = getArtistInfo(newArtistData)
     if (imageUrl) {
+      await sleep(1000)
       await sendImage(chat_id, imageUrl, text)
     } else {
       await sendMessage(chat_id, text)
