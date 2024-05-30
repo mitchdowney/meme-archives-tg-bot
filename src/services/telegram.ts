@@ -86,7 +86,7 @@ export const sendImage = async (chat_id: string, imageUrl: string,
     {
       params: { 
         chat_id,
-        photo: imageUrl,
+        photo: `${imageUrl}?random=${Math.floor(Math.random() * 1000) + 1}`,
         ...(text ? { caption: text } : {}),
         ...(options ? options : {})
       }
