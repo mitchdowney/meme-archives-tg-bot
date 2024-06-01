@@ -212,3 +212,8 @@ export const galleryEditArtist = async (id: number, data: GalleryUpdateArtist) =
 
   return response.data
 }
+
+export const galleryRemoveImageBackground = async (imageIdOrSlug: string) => {
+  const response = await galleryAPIAdminRequest('GET', `/rembg/${imageIdOrSlug}`)
+  return response.data
+}
