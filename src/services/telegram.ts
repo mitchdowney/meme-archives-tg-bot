@@ -84,30 +84,40 @@ export const sendImage = async (chat_id: string, imageUrl: string, shouldCheckAn
   if (shouldCheckAndRetry) {
     for (let i = 0; i < 5; i++) {
       try {
-        const response = await axios.head(`${imageUrl}?random=${Math.floor(Math.random() * 1000) + 1}`)
+        const response = await axios.head(imageUrl)
         if (response.status === 200) {
           break
         }
       } catch (error) {
         if (i === 4) {
-          throw new Error('Failed to fetch image URL after 5 attempts')
+          console.log('sendImage: Failed to fetch image URL after 5 attempts')
+          // Unfound images should log server-side but fail silently client-side
+          return
         }
-        await sendMessage(chat_id, `Retrying to fetch image URL ${i + 1} of 5...`)
         await new Promise(resolve => setTimeout(resolve, 3000))
       }
     }
   }
 
-  const response = await telegramAPIRequest('sendPhoto', {
-    params: {
+  try {
+    await telegramAPIRequest('sendPhoto', {
+      params: {
+        chat_id,
+        photo: imageUrl,
+        ...(text ? { caption: text } : {}),
+        ...(options ? options : {})
+      }
+    })
+  } catch (error) {
+    console.log('sendImage telegramAPIRequest')
+    console.log({
       chat_id,
-      photo: `${imageUrl}?random=${Math.floor(Math.random() * 1000) + 1}`,
+      photo: imageUrl,
+      ...(shouldCheckAndRetry ? { shouldCheckAndRetry } : {}),
       ...(text ? { caption: text } : {}),
       ...(options ? options : {})
-    }
-  })
-
-  return response.data
+    })    
+  }
 }
 
 type ExtraCallbackData = {
