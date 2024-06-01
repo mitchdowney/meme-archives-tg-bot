@@ -107,7 +107,7 @@ const startApp = async () => {
             if (imageUrl) {
               await sendImage(groupChatId, imageUrl)
             } else {
-              await sendMessage(groupChatId, 'Image not found')
+              // await sendMessage(groupChatId, 'Image not found')
             }
           }
 
