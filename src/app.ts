@@ -76,22 +76,22 @@ const startApp = async () => {
         const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
         if (commandText) {
           const commands = {
-            '/gallery_hello': webhookHandlers.galleryHello,
-            '/gallery_admin': webhookHandlers.galleryAdmin,
-            '/meme': webhookHandlers.getRandomImage,
-            '/random_image': webhookHandlers.getRandomImage,
-            '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
-            '/get_image_meta': webhookHandlers.getImageMeta,
-            '/get_image': webhookHandlers.getImage,
-            '/get_image_file': webhookHandlers.getImageFile,
-            '/upload_image': webhookHandlers.uploadImage,
-            '/ui': webhookHandlers.uploadImage,
+            '/ea': webhookHandlers.editArtist,
+            '/edit_artist': webhookHandlers.editArtist,
             '/edit_image': webhookHandlers.editImage,
             '/ei': webhookHandlers.editImage,
-            '/edit_artist': webhookHandlers.editArtist,
-            '/ea': webhookHandlers.editArtist,
+            '/gallery_admin': webhookHandlers.galleryAdmin,
+            '/gallery_hello': webhookHandlers.galleryHello,
+            '/gallery_standards': webhookHandlers.galleryStandards,
+            '/get_image_file': webhookHandlers.getImageFile,
+            '/get_image_meta': webhookHandlers.getImageMeta,
+            '/get_image': webhookHandlers.getImage,
+            '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
+            '/meme': webhookHandlers.getRandomImage,
+            '/random_image': webhookHandlers.getRandomImage,
             '/remove_image_background': webhookHandlers.removeImageBackground,
-            '/gallery_standards': webhookHandlers.galleryStandards
+            '/ui': webhookHandlers.uploadImage,
+            '/upload_image': webhookHandlers.uploadImage
           }
           
           for (const [command, handler] of Object.entries(commands)) {
@@ -119,10 +119,10 @@ const startApp = async () => {
 
         } else if (callbackDataObject?.callback_data) {
           const callbackDataHandlers = {
-            'get_image_prompt': webhookHandlers.getImagePrompt,
-            'upload_image_prompt': webhookHandlers.uploadImagePrompt,
+            'edit_artist_prompt': webhookHandlers.editArtistPrompt,          
             'edit_image_prompt': webhookHandlers.editImagePrompt,
-            'edit_artist_prompt': webhookHandlers.editArtistPrompt            
+            'get_image_prompt': webhookHandlers.getImagePrompt,
+            'upload_image_prompt': webhookHandlers.uploadImagePrompt
           }
         
           const handler = callbackDataHandlers[callbackDataObject.callback_data]
