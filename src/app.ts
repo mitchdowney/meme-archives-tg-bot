@@ -7,15 +7,19 @@ const cors = require('cors')
 import * as express from 'express'
 import { NextFunction, Request, Response } from 'express'
 import { HttpError } from 'http-errors'
-import { getArtistInfo, getArtistProfilePictureUrl, getAvailableImageUrl, getImageInfo, sleep } from './lib/galleryHelpers'
+import { getArtistInfo, getArtistProfilePictureUrl, getAvailableImageUrl,
+  getImageInfo } from './lib/galleryHelpers'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
-import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetRandomImage, galleryUploadImage } from './services/galleryAPI'
+import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetRandomImage,
+  galleryRemoveImageBackground, galleryUploadImage } from './services/galleryAPI'
 import { getCommandText, getImageFile, getUserMention, parseEditArtistCommand, parseEditImageCommand,
-  parseUploadImageCommand, sendGalleryAdmin, sendImage, sendMessage, setWebhook } from './services/telegram'
+  parseUploadImageCommand, sendDocument, sendGalleryAdmin, sendImage, sendMessage,
+  setWebhook } from './services/telegram'
 import { checkIsAllowedChat, getChatId } from './middleware/checkIsAllowedChat'
 import { config } from './config'
-import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes, updateTagCommandsIndex } from './services/memesIndex'
+import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes,
+  updateTagCommandsIndex } from './services/memesIndex'
 
 const port = 9000
 
@@ -79,12 +83,14 @@ const startApp = async () => {
             '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
             '/get_image_meta': webhookHandlers.getImageMeta,
             '/get_image': webhookHandlers.getImage,
+            '/get_image_file': webhookHandlers.getImageFile,
             '/upload_image': webhookHandlers.uploadImage,
             '/ui': webhookHandlers.uploadImage,
             '/edit_image': webhookHandlers.editImage,
             '/ei': webhookHandlers.editImage,
             '/edit_artist': webhookHandlers.editArtist,
             '/ea': webhookHandlers.editArtist,
+            '/remove_image_background': webhookHandlers.removeImageBackground,
             '/gallery_standards': webhookHandlers.galleryStandards
           }
           
@@ -260,6 +266,19 @@ const webhookHandlers = {
       await sendMessage(chat_id, text)
     }
   },
+  getImageFile: async (req: Request) => {
+    const commandText = getCommandText(req)
+    const chat_id = req?.body?.message?.chat?.id
+    const imageId = commandText.split(' ')[1]
+    const image = await galleryGetImage(imageId)
+    const imageUrl = getAvailableImageUrl('no-border', image)
+    const caption = getImageInfo(image)
+    if (imageUrl) {
+      await sendDocument(chat_id, imageUrl, caption)
+    } else {
+      await sendMessage(chat_id, 'Image not found')
+    }
+  },
   uploadImage: async (req: Request) => {
     await checkIsGroupAdmin(req)
     const commandText = getCommandText(req)
@@ -359,6 +378,21 @@ const webhookHandlers = {
     }
 
     updateTagCommandsIndex(chat_id)
+  },
+  removeImageBackground: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const commandText = getCommandText(req)
+    const chat_id = req?.body?.message?.chat?.id
+    const imageId = commandText.split(' ')[1]
+    await galleryRemoveImageBackground(imageId)
+    const image = await galleryGetImage(imageId)
+    const imageUrl = getAvailableImageUrl('no-border', image)
+    const caption = getImageInfo(image)
+    if (imageUrl) {
+      await sendDocument(chat_id, imageUrl, caption)
+    } else {
+      await sendMessage(chat_id, 'Image not found')
+    }
   },
   galleryStandards: async (req: Request) => {
     const chat_id = req?.body?.message?.chat?.id

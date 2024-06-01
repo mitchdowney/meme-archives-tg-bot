@@ -120,6 +120,22 @@ export const sendImage = async (chat_id: string, imageUrl: string, shouldCheckAn
   }
 }
 
+export const sendDocument = async (chat_id: string, documentUrl: string,
+  caption: string, options?: SendMessageOptions) => {
+  const response = await telegramAPIRequest('sendDocument',
+    {
+      params: { 
+        chat_id,
+        document: documentUrl,
+        ...(caption ? { caption } : {}),
+        ...(options ? options : {})
+      }
+    }
+  )
+  
+  return response.data
+}
+
 type ExtraCallbackData = {
   callback_data: string
 }
