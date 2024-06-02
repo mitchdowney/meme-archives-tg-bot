@@ -68,13 +68,15 @@ const startApp = async () => {
   */
 
   app.post('/webhook',
+    function (req: Request, res: Response, next: NextFunction) {
+      // Send 200 response immediately so that commands are not retried
+      res.sendStatus(200)
+      next()
+    },
     checkBotAppSecretKey,
     checkIsAllowedChat,
     async function (req: Request, res: Response, next: NextFunction) {
       try {
-        // Send 200 response immediately so that commands are not retried
-        res.sendStatus(200)
-
         const commandText = getCommandText(req)
         const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
         if (commandText) {
