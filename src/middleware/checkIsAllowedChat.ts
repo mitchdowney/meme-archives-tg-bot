@@ -15,5 +15,5 @@ export const checkIsAllowedChat = (req, res, next) => {
 }
 
 export const getChatId = (req) => {
-  return req?.body?.message?.chat?.id || req?.body?.callback_query?.message?.chat?.id
+  return req?.body?.message?.chat?.id || req?.body?.edited_message?.chat?.id || req?.body?.callback_query?.message?.chat?.id
 }
