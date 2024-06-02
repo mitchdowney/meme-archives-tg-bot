@@ -91,8 +91,9 @@ const startApp = async () => {
             '/get_image': webhookHandlers.getImage,
             '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
             '/meme': webhookHandlers.getRandomImage,
-            '/random_image': webhookHandlers.getRandomImage,
             '/remove_image_background': webhookHandlers.removeImageBackground,
+            '/random_image': webhookHandlers.getRandomImage,
+            '/random': webhookHandlers.getRandomImage,
             '/ui': webhookHandlers.uploadImage,
             '/upload_image': webhookHandlers.uploadImage
           }
@@ -100,7 +101,8 @@ const startApp = async () => {
           for (const [command, handler] of Object.entries(commands)) {
             if (new RegExp(`^${command}( |@${config.BOT_USER_NAME})?.*$`).test(commandText)) {
               await handler(req)
-              break
+              // return so that the command is not checked against the tagCommandsIndex
+              return
             }
           }
 
