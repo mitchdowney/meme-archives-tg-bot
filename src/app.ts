@@ -72,6 +72,9 @@ const startApp = async () => {
     checkIsAllowedChat,
     async function (req: Request, res: Response, next: NextFunction) {
       try {
+        // Send 200 response immediately so that commands are not retried
+        res.sendStatus(200)
+
         const commandText = getCommandText(req)
         const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
         if (commandText) {
@@ -131,9 +134,6 @@ const startApp = async () => {
             await handler(req)
           }
         }
-
-        res.status(200)
-        res.send()
       } catch (error) {
         next(error)
       }
@@ -151,10 +151,6 @@ const startApp = async () => {
     if (chat_id && errorMessage) {
       sendMessage(chat_id, errorMessage)
     }
-    
-    // Telegram must always receive a 200 response, or it will keep retrying
-    res.status(200)
-    res.send()
   })
 
   app.listen(port)
