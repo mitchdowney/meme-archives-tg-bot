@@ -94,6 +94,7 @@ const startApp = async () => {
             '/get_image': webhookHandlers.getImage,
             '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
             '/meme': webhookHandlers.getRandomImage,
+            '/my_id': webhookHandlers.myId,
             '/remove_image_background': webhookHandlers.removeImageBackground,
             '/random_image': webhookHandlers.getRandomImage,
             '/random': webhookHandlers.getRandomImage,
@@ -274,6 +275,10 @@ const webhookHandlers = {
     } else {
       await sendMessage(chat_id, text)
     }
+  },
+  my_id: async (req: Request) => {    
+    const chat_id = getChatId(req)
+    sendMessage(chat_id, `Your Telegram ID is ${req?.body?.message?.from?.id}`)
   },
   getImageFile: async (req: Request) => {
     const commandText = getCommandText(req)
