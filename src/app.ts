@@ -276,7 +276,7 @@ const webhookHandlers = {
       await sendMessage(chat_id, text)
     }
   },
-  my_id: async (req: Request) => {    
+  myId: async (req: Request) => {    
     const chat_id = getChatId(req)
     sendMessage(chat_id, `Your Telegram ID is ${req?.body?.message?.from?.id}`)
   },
