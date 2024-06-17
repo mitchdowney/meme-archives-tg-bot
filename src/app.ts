@@ -97,6 +97,7 @@ const startApp = async () => {
             '/remove_image_background': webhookHandlers.removeImageBackground,
             '/random_image': webhookHandlers.getRandomImage,
             '/random': webhookHandlers.getRandomImage,
+            '/refresh_tags': webhookHandlers.refreshTags,
             '/ui': webhookHandlers.uploadImage,
             '/upload_image': webhookHandlers.uploadImage
           }
@@ -383,6 +384,13 @@ const webhookHandlers = {
     }
 
     updateTagCommandsIndex(chat_id)
+  },
+  refreshTags: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const chat_id = getChatId(req)
+    if (chat_id) {
+      await updateTagCommandsIndex(chat_id)
+    }
   },
   removeImageBackground: async (req: Request) => {
     await checkIsGroupAdmin(req)
