@@ -419,8 +419,7 @@ const webhookHandlers = {
     const chat_id = getChatId(req)
     const dealerUserName = getUserName(req)
     const playerUserNames = getMentionedUserNames(req)
-    const pokerRound = startPokerRound(chat_id, dealerUserName, [dealerUserName, ...playerUserNames])
-
+    const pokerRound = startPokerRound(chat_id, dealerUserName, [dealerUserName, ...playerUserNames.slice(0, 4)])
     if (pokerRound) {
       for (const pokerHand of pokerRound.pokerHands) {
         await sendPokerHand(chat_id, pokerHand)
