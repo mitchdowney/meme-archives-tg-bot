@@ -1,4 +1,4 @@
-import { sendMessage } from "../telegram"
+import { sendMessage } from '../telegram'
 
 const pokerRoundsIndex = {}
 
