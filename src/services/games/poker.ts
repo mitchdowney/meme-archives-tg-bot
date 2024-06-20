@@ -93,7 +93,7 @@ export const findPokerHand = (chatId: string, playerUsername: string): PokerHand
 
 export const sendPokerHand = async (chat_id: string, pokerHand: PokerHand) => {
   const imageUrl = await generatePokerHandImage(chat_id, pokerHand) 
-  await sendImage(chat_id, imageUrl, true, `@${pokerHand.username}'`)
+  await sendImage(chat_id, imageUrl, true, `@${pokerHand.username}`)
 }
 
 const generatePokerHandImage = async (chat_id: string, pokerHand: PokerHand) => {
