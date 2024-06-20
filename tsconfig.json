@@ -8,6 +8,7 @@
       "rootDir": "./src",
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
-      "strictNullChecks": true
+      "strictNullChecks": true,
+      "downlevelIteration": true
   }
 }
