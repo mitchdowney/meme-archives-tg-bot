@@ -3,6 +3,8 @@
 require('dotenv').config()
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cors = require('cors')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const path = require('path')
 
 import * as express from 'express'
 import { NextFunction, Request, Response } from 'express'
@@ -45,6 +47,8 @@ const startApp = async () => {
   app.get('/', async function (req: Request, res: Response) {
     res.send('The bot is running!')
   })
+
+  app.use('/assets', express.static(path.join(__dirname, 'assets')))
 
   app.get('/activate', async function (req: Request, res: Response) {
     try {
