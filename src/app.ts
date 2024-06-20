@@ -426,12 +426,16 @@ const webhookHandlers = {
   },
   pokerDeal: async (req: Request) => {
     const chat_id = getChatId(req)
+    console.log('chat_id', chat_id)
     const dealerUserName = getUserName(req)
+    console.log('dealerUserName', dealerUserName)
     const playerUserNames = getMentionedUserNames(req)
+    console.log('playerUserNames', playerUserNames)
     const pokerRound = startPokerRound(chat_id, dealerUserName, playerUserNames)
-
+    console.log('pokerRound', pokerRound)
     if (pokerRound) {
       for (const pokerHand of pokerRound.pokerHands) {
+        console.log('sending poker hand', chat_id, pokerHand)
         await sendPokerHand(chat_id, pokerHand)
       }
     }
