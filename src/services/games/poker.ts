@@ -107,7 +107,8 @@ const generatePokerHandImage = async (chat_id: string, pokerHand: PokerHand) => 
     }
   })
 
-  const imagePath = `../../assets/games/poker/hands/${chat_id}_${pokerHand.username}.png`
+  const currentDate = new Date()
+  const imagePath = `../../assets/games/poker/hands/${chat_id}_${pokerHand.username}_${currentDate.getTime()}.png`
   const outputFile = path.join(__dirname, imagePath)
   await sharp(canvasPath)
     .composite(compositeOperations)
