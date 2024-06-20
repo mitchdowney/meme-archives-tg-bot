@@ -1,10 +1,15 @@
-import { sendMessage } from '../telegram'
+/* eslint-disable @typescript-eslint/no-var-requires */
+import { config } from '../../config'
+import { sendImage } from '../telegram'
+
+const sharp = require('sharp')
+const path = require('path')
 
 const pokerRoundsIndex = {}
 
-type PokerRank = '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'Jack' | 'Queen' | 'King' | 'Ace' | 'Joker'
+type PokerRank = '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'jack' | 'queen' | 'king' | 'ace' | 'joker'
 
-type PokerSuit = 'Hearts' | 'Diamonds' | 'Clubs' | 'Spades' | 'Black' | 'Red'
+type PokerSuit = 'hearts' | 'diamonds' | 'clubs' | 'spades' | 'black' | 'red'
 
 type PokerCard = {
   rank: PokerRank
@@ -25,8 +30,8 @@ type PokerRound = {
 }
 
 export const startPokerRound = (chatId: string, dealerUsername: string, playerUsernames: string[]): PokerRound => {
-  const suits: PokerSuit[] = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
-  const ranks: PokerRank[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
+  const suits: PokerSuit[] = ['hearts', 'diamonds', 'clubs', 'spades']
+  const ranks: PokerRank[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king', 'ace']
   const deck: PokerCard[] = []
 
   for (const suit of suits) {
@@ -35,8 +40,8 @@ export const startPokerRound = (chatId: string, dealerUsername: string, playerUs
     }
   }
 
-  deck.push({ rank: 'Joker', suit: 'Black' })
-  deck.push({ rank: 'Joker', suit: 'Red' })
+  deck.push({ rank: 'joker', suit: 'black' })
+  deck.push({ rank: 'joker', suit: 'red' })
 
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -87,6 +92,27 @@ export const findPokerHand = (chatId: string, playerUsername: string): PokerHand
 }
 
 export const sendPokerHand = async (chat_id: string, pokerHand: PokerHand) => {
-  const pokerHandMessage = `@${pokerHand.username} ${pokerHand.hand.map(card => `${card.rank} of ${card.suit}`).join(', ')}`
-  await sendMessage(chat_id, pokerHandMessage)
+  const imageUrl = await generatePokerHandImage(chat_id, pokerHand) 
+  await sendImage(chat_id, imageUrl, true, `@${pokerHand.username}'`)
+}
+
+const generatePokerHandImage = async (chat_id: string, pokerHand: PokerHand) => {
+  const canvasPath = path.join(__dirname, 'assets/games/poker/poker_hand_canvas.png')
+  const compositeOperations = pokerHand.hand.map((card, index) => {
+    const cardImagePath = path.join(__dirname, `assets/games/poker/${card.suit.toLowerCase()}_${card.rank.toLowerCase()}.png`)
+    return {
+      input: cardImagePath,
+      left: index * 234, // Each card is 234px wide, and 333px tall
+      top: 0, // Align cards at the top of the canvas
+    }
+  })
+
+  const imagePath = `assets/games/poker/hands/${chat_id}_${pokerHand.username}.png`
+  const outputFile = path.join(__dirname, imagePath)
+  await sharp(canvasPath)
+    .composite(compositeOperations)
+    .toFile(outputFile)
+
+  const imageUrl = config.BOT_APP_ORIGIN + '/' + imagePath
+  return imageUrl
 }

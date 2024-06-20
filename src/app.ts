@@ -3,6 +3,8 @@
 require('dotenv').config()
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cors = require('cors')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const path = require('path')
 
 import * as express from 'express'
 import { NextFunction, Request, Response } from 'express'
@@ -45,6 +47,8 @@ const startApp = async () => {
   app.get('/', async function (req: Request, res: Response) {
     res.send('The bot is running!')
   })
+
+  app.use('/assets', express.static(path.join(__dirname, 'assets')))
 
   app.get('/activate', async function (req: Request, res: Response) {
     try {
@@ -428,7 +432,7 @@ const webhookHandlers = {
     const chat_id = getChatId(req)
     const dealerUserName = getUserName(req)
     const playerUserNames = getMentionedUserNames(req)
-    const pokerRound = startPokerRound(chat_id, dealerUserName, [dealerUserName, ...playerUserNames])
+    const pokerRound = startPokerRound(chat_id, dealerUserName, [dealerUserName, ...playerUserNames.slice(0, 4)])
     if (pokerRound) {
       for (const pokerHand of pokerRound.pokerHands) {
         await sendPokerHand(chat_id, pokerHand)
