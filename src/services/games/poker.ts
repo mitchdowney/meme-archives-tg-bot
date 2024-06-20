@@ -97,9 +97,9 @@ export const sendPokerHand = async (chat_id: string, pokerHand: PokerHand) => {
 }
 
 const generatePokerHandImage = async (chat_id: string, pokerHand: PokerHand) => {
-  const canvasPath = path.join(__dirname, 'assets/games/poker/poker_hand_canvas.png')
+  const canvasPath = path.join(__dirname, '../../assets/games/poker/poker_hand_canvas.png')
   const compositeOperations = pokerHand.hand.map((card, index) => {
-    const cardImagePath = path.join(__dirname, `assets/games/poker/${card.suit.toLowerCase()}_${card.rank.toLowerCase()}.png`)
+    const cardImagePath = path.join(__dirname, `../../assets/games/poker/${card.suit.toLowerCase()}_${card.rank.toLowerCase()}.png`)
     return {
       input: cardImagePath,
       left: index * 234, // Each card is 234px wide, and 333px tall
@@ -107,7 +107,7 @@ const generatePokerHandImage = async (chat_id: string, pokerHand: PokerHand) => 
     }
   })
 
-  const imagePath = `assets/games/poker/hands/${chat_id}_${pokerHand.username}.png`
+  const imagePath = `../../assets/games/poker/hands/${chat_id}_${pokerHand.username}.png`
   const outputFile = path.join(__dirname, imagePath)
   await sharp(canvasPath)
     .composite(compositeOperations)
