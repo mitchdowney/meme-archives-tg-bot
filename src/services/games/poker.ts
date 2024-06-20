@@ -1,4 +1,4 @@
-import { sendMessage } from "../telegram"
+import { sendMessage } from '../telegram'
 
 const pokerRoundsIndex = {}
 
@@ -43,7 +43,9 @@ export const startPokerRound = (chatId: string, dealerUsername: string, playerUs
     [deck[i], deck[j]] = [deck[j], deck[i]]
   }
 
-  const pokerHands = playerUsernames.map(username => {
+  const uniqueUsernames = [...new Set(playerUsernames)]
+
+  const pokerHands = uniqueUsernames.map(username => {
     const hand = deck.slice(0, 5)
     deck.splice(0, 5)
     return { username, hand }
