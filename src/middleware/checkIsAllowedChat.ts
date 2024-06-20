@@ -1,5 +1,6 @@
 import { Forbidden } from 'http-errors'
 import { config } from '../config'
+import { getChatId } from '../services/telegram'
 
 export const checkIsAllowedChat = (req, res, next) => {
   if (config.BOT_APP_ALLOW_ALL_GROUP_CHATS) {
@@ -14,6 +15,4 @@ export const checkIsAllowedChat = (req, res, next) => {
   }
 }
 
-export const getChatId = (req) => {
-  return req?.body?.message?.chat?.id || req?.body?.edited_message?.chat?.id || req?.body?.callback_query?.message?.chat?.id
-}
+

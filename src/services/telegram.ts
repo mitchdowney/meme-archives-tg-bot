@@ -343,3 +343,26 @@ export const parseEditArtistCommand = createCommandParser(
 export const getCommandText = (req: Request) => {
   return req?.body?.message?.text || req?.body?.message?.caption
 }
+
+export const getChatId = (req) => {
+  return req?.body?.message?.chat?.id || req?.body?.edited_message?.chat?.id || req?.body?.callback_query?.message?.chat?.id
+}
+
+export const getUserName = (req) => {
+  return req?.body?.message?.from?.username || req?.body?.edited_message?.from?.username || req?.body?.callback_query?.from?.username
+}
+
+export const getMentionedUserNames = (req) => {
+  const text = getCommandText(req)
+  const mentionedUsers: string[] = []
+  const regex = /@([a-zA-Z0-9_]+)/g
+  let match: RegExpExecArray | null
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match[1]) {
+      mentionedUsers.push(match[1])
+    }
+  }
+
+  return mentionedUsers
+}
