@@ -13,13 +13,14 @@ import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
 import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetRandomImage,
   galleryRemoveImageBackground, galleryUploadImage } from './services/galleryAPI'
-import { getCommandText, getImageFile, getUserMention, parseEditArtistCommand, parseEditImageCommand,
+import { getChatId, getCommandText, getImageFile, getMentionedUserNames, getUserMention, getUserName, parseEditArtistCommand, parseEditImageCommand,
   parseUploadImageCommand, sendDocument, sendGalleryAdmin, sendImage, sendMessage,
   setWebhook } from './services/telegram'
-import { checkIsAllowedChat, getChatId } from './middleware/checkIsAllowedChat'
+import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
 import { config } from './config'
 import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes,
   updateTagCommandsIndex } from './services/memesIndex'
+import { sendPokerHand, startPokerRound } from './services/games/poker'
 
 const port = 9000
 
@@ -100,7 +101,8 @@ const startApp = async () => {
             '/random': webhookHandlers.getRandomImage,
             '/refresh_tags': webhookHandlers.refreshTags,
             '/ui': webhookHandlers.uploadImage,
-            '/upload_image': webhookHandlers.uploadImage
+            '/upload_image': webhookHandlers.uploadImage,
+            '/poker_deal': webhookHandlers.pokerDeal
           }
           
           for (const [command, handler] of Object.entries(commands)) {
@@ -422,4 +424,16 @@ const webhookHandlers = {
     const text = `Try to make image titles and tags as intuitive for searching as possible.\nTry to reuse existing tag names.\nSearch the gallery to make sure the image your uploading isn't there already.\nIf an image is a profile picture, use the \"pfp\" tag.\nUse capitalization for titles like a book title (lowercase articles), unless you think it should be an exception.`
     await sendMessage(chat_id, text)
   },
+  pokerDeal: async (req: Request) => {
+    const chat_id = getChatId(req)
+    const dealerUserName = getUserName(req)
+    const playerUserNames = getMentionedUserNames(req)
+    const pokerRound = startPokerRound(chat_id, dealerUserName, playerUserNames)
+
+    if (pokerRound) {
+      for (const pokerHand of pokerRound.pokerHands) {
+        await sendPokerHand(chat_id, pokerHand)
+      }
+    }
+  }
 }
