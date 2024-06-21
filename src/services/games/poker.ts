@@ -94,8 +94,8 @@ export const checkIfAllPlayersHaveDiscarded = (pokerRound: PokerRound): boolean 
 export const dealFinalPokerHands = async (pokerRound: PokerRound) => {
   const pokerHands = pokerRound.pokerHands
   for (const pokerHand of pokerHands) {
-    const spoiler = false
-    await sendPokerHand(pokerRound.chatId, pokerHand, spoiler)
+    const has_spoiler = false
+    await sendPokerHand(pokerRound.chatId, pokerHand, has_spoiler)
   }
 }
 
@@ -188,10 +188,10 @@ export const findPokerHand = (chatId: string, playerUsername: string): FoundPoke
   return null
 }
 
-export const sendPokerHand = async (chat_id: string, pokerHand: PokerHand, spoiler: boolean) => {
+export const sendPokerHand = async (chat_id: string, pokerHand: PokerHand, has_spoiler: boolean) => {
   const imageUrl = await generatePokerHandImage(chat_id, pokerHand)
   const shouldCheckAndRetry = true
-  await sendImage(chat_id, imageUrl, shouldCheckAndRetry, `@${pokerHand.username}`, spoiler)
+  await sendImage(chat_id, imageUrl, shouldCheckAndRetry, `@${pokerHand.username}`, has_spoiler)
 }
 
 const generatePokerHandImage = async (chat_id: string, pokerHand: PokerHand) => {
