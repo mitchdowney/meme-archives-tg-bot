@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Request } from 'express'
 import { config } from '../../config'
-import { sendImage } from '../telegram'
+import { sendImage, sendMessage } from '../telegram'
 
 const sharp = require('sharp')
 const path = require('path')
+const HandSolver = require('pokersolver').Hand;
 
 type PokerRank = '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'jack' | 'queen' | 'king' | 'ace' | 'joker'
 
@@ -80,9 +81,7 @@ export const pokerRedrawCardsForPlayer = (chatId: string, playerUsername: string
 
   pokerRound.playerUsernamesFinishedDiscarding.push(playerUsername)
   pokerRound.pokerHands[pokerHandIndex] = pokerHand
-  console.log('pokerRound', pokerRound)
   pokerRoundsIndex[chatId][dealerUsername] = pokerRound
-  console.log('pokerRoundsIndex', pokerRoundsIndex)
 
   return pokerRound
 }
@@ -97,6 +96,19 @@ export const dealFinalPokerHands = async (pokerRound: PokerRound) => {
     const has_spoiler = false
     await sendPokerHand(pokerRound.chatId, pokerHand, has_spoiler)
   }
+}
+
+export const sendPokerHandWinner = async (pokerRound: PokerRound) => {
+  const pokerHands = pokerRound.pokerHands
+  const winningHand = pokerHands.reduce((prevPokerHand, currentPokerHand) => {
+    const prevHand = convertHandToPokerSolverHand(prevPokerHand)
+    const currentHand = convertHandToPokerSolverHand(currentPokerHand)
+    const prevHandRank = HandSolver.solve(prevHand).rank
+    const currentHandRank = HandSolver.solve(currentHand).rank
+    return prevHandRank > currentHandRank ? prevPokerHand : currentPokerHand
+  })
+
+  await sendMessage(pokerRound.chatId, `@${winningHand.username} wins!`)
 }
 
 const removeExistingRoundsWithUsernames = (chatId: string, playerUsernames: string[]) => {
@@ -190,8 +202,38 @@ export const findPokerHand = (chatId: string, playerUsername: string): FoundPoke
 
 export const sendPokerHand = async (chat_id: string, pokerHand: PokerHand, has_spoiler: boolean) => {
   const imageUrl = await generatePokerHandImage(chat_id, pokerHand)
+  const handSolverCards = convertHandToPokerSolverHand(pokerHand)
+  const handDescription = has_spoiler
+    ? `@${pokerHand.username}`
+    : `@${pokerHand.username} - ${HandSolver.solve(handSolverCards).descr}`
+
   const shouldCheckAndRetry = true
-  await sendImage(chat_id, imageUrl, shouldCheckAndRetry, `@${pokerHand.username}`, has_spoiler)
+  await sendImage(chat_id, imageUrl, shouldCheckAndRetry, handDescription, has_spoiler)
+}
+
+const convertHandToPokerSolverHand = (pokerHand: PokerHand) => {
+  const suitMap = {
+    diamonds: 'd',
+    clubs: 'c',
+    hearts: 'h',
+    spades: 's',
+    black: 'b',
+    red: 'r'
+  }
+  const rankMap = {
+    '10': 'T',
+    'jack': 'J',
+    'queen': 'Q',
+    'king': 'K',
+    'ace': 'A',
+    'joker': 'O'
+  }
+
+  return pokerHand?.pokerHand?.map(card => {
+    const rank = rankMap[card.rank] || card.rank
+    const suit = suitMap[card.suit]
+    return `${rank}${suit}`
+  }) || []
 }
 
 const generatePokerHandImage = async (chat_id: string, pokerHand: PokerHand) => {
