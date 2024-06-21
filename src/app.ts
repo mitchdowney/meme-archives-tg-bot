@@ -23,7 +23,7 @@ import { config } from './config'
 import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes,
   updateTagCommandsIndex } from './services/memesIndex'
 import { checkIfAllPlayersHaveDiscarded, dealFinalPokerHands, getDiscardPositions, pokerRedrawCardsForPlayer,
-  sendPokerHand, startPokerRound } from './services/games/poker'
+  sendPokerHand, sendPokerHandWinner, startPokerRound } from './services/games/poker'
 
 const port = 9000
 
@@ -444,6 +444,7 @@ const webhookHandlers = {
       const allPlayersHaveDiscarded = checkIfAllPlayersHaveDiscarded(pokerRound)
       if (allPlayersHaveDiscarded) {
         await dealFinalPokerHands(pokerRound)
+        await sendPokerHandWinner(pokerRound)
       }
     }
   }
