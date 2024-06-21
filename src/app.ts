@@ -431,6 +431,7 @@ const webhookHandlers = {
     await sendMessage(chat_id, text)
   },
   pokerDeal: async (req: Request) => {
+    await checkIsGroupAdmin(req)
     const chat_id = getChatId(req)
     const dealerUserName = getUserName(req)
     const playerUserNames = getMentionedUserNames(req)
