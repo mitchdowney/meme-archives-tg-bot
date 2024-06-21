@@ -15,14 +15,15 @@ import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
 import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetRandomImage,
   galleryRemoveImageBackground, galleryUploadImage } from './services/galleryAPI'
-import { getChatId, getCommandText, getImageFile, getMentionedUserNames, getUserMention, getUserName, parseEditArtistCommand, parseEditImageCommand,
-  parseUploadImageCommand, sendDocument, sendGalleryAdmin, sendImage, sendMessage,
-  setWebhook } from './services/telegram'
+import { getChatId, getCommandText, getImageFile, getMentionedUserNames, getUserMention, getUserName,
+  parseEditArtistCommand, parseEditImageCommand, parseUploadImageCommand, sendDocument, sendGalleryAdmin,
+  sendImage, sendMessage, setWebhook } from './services/telegram'
 import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
 import { config } from './config'
 import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes,
   updateTagCommandsIndex } from './services/memesIndex'
-import { sendPokerHand, startPokerRound } from './services/games/poker'
+import { checkIfAllPlayersHaveDiscarded, dealFinalPokerHands, getDiscardPositions, pokerRedrawCardsForPlayer,
+  sendPokerHand, startPokerRound } from './services/games/poker'
 
 const port = 9000
 
@@ -106,7 +107,8 @@ const startApp = async () => {
             '/refresh_tags': webhookHandlers.refreshTags,
             '/ui': webhookHandlers.uploadImage,
             '/upload_image': webhookHandlers.uploadImage,
-            '/poker_deal': webhookHandlers.pokerDeal
+            '/poker_deal': webhookHandlers.pokerDeal,
+            '/poker_draw': webhookHandlers.pokerDraw
           }
           
           for (const [command, handler] of Object.entries(commands)) {
@@ -436,6 +438,19 @@ const webhookHandlers = {
     if (pokerRound) {
       for (const pokerHand of pokerRound.pokerHands) {
         await sendPokerHand(chat_id, pokerHand)
+      }
+    }
+  },
+  pokerDraw: async (req: Request) => {
+    const chat_id = getChatId(req)
+    const playerUsername = getUserName(req)
+    const discardPositions = getDiscardPositions(req)
+    const pokerRound = pokerRedrawCardsForPlayer(chat_id, playerUsername, discardPositions)
+    console.log('pokerDraw pokerRound', pokerRound)
+    if (pokerRound) {
+      const allPlayersHaveDiscarded = checkIfAllPlayersHaveDiscarded(pokerRound)
+      if (allPlayersHaveDiscarded) {
+        await dealFinalPokerHands(pokerRound)
       }
     }
   }

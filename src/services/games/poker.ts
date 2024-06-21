@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import { Request } from 'express'
 import { config } from '../../config'
 import { sendImage } from '../telegram'
 
 const sharp = require('sharp')
 const path = require('path')
-
-const pokerRoundsIndex = {}
 
 type PokerRank = '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'jack' | 'queen' | 'king' | 'ace' | 'joker'
 
@@ -18,7 +17,7 @@ type PokerCard = {
 
 type PokerHand = {
   username: string
-  hand: PokerCard[]
+  pokerHand: PokerCard[]
 }
 
 type PokerRound = {
@@ -27,9 +26,96 @@ type PokerRound = {
   playerUsernames: string[]
   pokerHands: PokerHand[]
   pokerDiscards: PokerHand[]
+  deckRemaining: PokerCard[]
+  playerUsernamesFinishedDiscarding: string[]
+}
+
+type PokerDiscardPosition = 1 | 2 | 3 | 4 | 5
+
+type PokerRoundsIndex = {
+  [chatId: string]: {
+    [dealerUsername: string]: PokerRound
+  }
+}
+
+const pokerRoundsIndex: PokerRoundsIndex = {}
+
+export const pokerRedrawCardsForPlayer = (chatId: string, playerUsername: string,
+  discardPositions: PokerDiscardPosition[]): PokerRound | null => {
+  const pokerRounds = pokerRoundsIndex[chatId]
+  if (!pokerRounds) {
+    console.log(`No poker rounds found for chatId: ${chatId}`)
+    return null
+  }
+
+  const foundPokerHand = findPokerHand(chatId, playerUsername)
+  if (!foundPokerHand) {
+    console.log(`No poker hand found for user: ${playerUsername} in chatId: ${chatId}`)
+    return null
+  }
+
+  const dealerUsername = foundPokerHand.dealerUsername
+  const pokerRound = pokerRounds[dealerUsername]
+  const pokerHand = foundPokerHand.pokerHand
+  const pokerHandIndex = foundPokerHand.pokerHandIndex
+
+  const hasAlreadyDiscarded = pokerRound.playerUsernamesFinishedDiscarding.includes(playerUsername)
+  if (hasAlreadyDiscarded) {
+    console.log(`Player has already discarded: ${playerUsername} in chatId: ${chatId}`)
+    return null
+  }
+
+  discardPositions.forEach(position => {
+    if (position < 1 || position > 5) {
+      console.log(`Invalid discard position: ${position} ${playerUsername} in chatId: ${chatId}`)
+      return null
+    }
+    const deckIndex = position - 1
+    if (pokerRound?.deckRemaining?.length > 0) {
+      const newCard = pokerRound.deckRemaining.shift()
+      if (newCard) {
+        pokerHand[deckIndex] = newCard
+      }
+    }
+  })
+
+  pokerRound.playerUsernamesFinishedDiscarding.push(playerUsername)
+  pokerRound.pokerHands[pokerHandIndex] = pokerHand
+  console.log('pokerRound', pokerRound)
+  pokerRoundsIndex[chatId][dealerUsername] = pokerRound
+  console.log('pokerRoundsIndex', pokerRoundsIndex)
+
+  return pokerRound
+}
+
+export const checkIfAllPlayersHaveDiscarded = (pokerRound: PokerRound): boolean => {
+  return pokerRound.playerUsernames.length === pokerRound.playerUsernamesFinishedDiscarding.length
+}
+
+export const dealFinalPokerHands = async (pokerRound: PokerRound) => {
+  const pokerHands = pokerRound.pokerHands
+  for (const pokerHand of pokerHands) {
+    await sendPokerHand(pokerRound.chatId, pokerHand)
+  }
+}
+
+const removeExistingRoundsWithUsernames = (chatId: string, playerUsernames: string[]) => {
+  const pokerRounds = pokerRoundsIndex[chatId]
+  if (pokerRounds) {
+    const dealerUsernames = Object.keys(pokerRounds)
+    for (const dealerUsername of dealerUsernames) {
+      const pokerRound = pokerRounds[dealerUsername]
+      const hasPlayerUsername = pokerRound.playerUsernames.some(username => playerUsernames.includes(username))
+      if (hasPlayerUsername) {
+        delete pokerRoundsIndex[chatId][dealerUsername]
+      }
+    }
+  }
 }
 
 export const startPokerRound = (chatId: string, dealerUsername: string, playerUsernames: string[]): PokerRound => {
+  removeExistingRoundsWithUsernames(chatId, playerUsernames)
+
   const suits: PokerSuit[] = ['hearts', 'diamonds', 'clubs', 'spades']
   const ranks: PokerRank[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king', 'ace']
   const deck: PokerCard[] = []
@@ -51,17 +137,19 @@ export const startPokerRound = (chatId: string, dealerUsername: string, playerUs
   const uniqueUsernames = [...new Set(playerUsernames)]
 
   const pokerHands = uniqueUsernames.map(username => {
-    const hand = deck.slice(0, 5)
+    const pokerHand = deck.slice(0, 5)
     deck.splice(0, 5)
-    return { username, hand }
+    return { username, pokerHand }
   })
 
-  const pokerRound = {
+  const pokerRound: PokerRound = {
     chatId,
     dealerUsername,
     playerUsernames,
     pokerHands,
-    pokerDiscards: []
+    pokerDiscards: [],
+    deckRemaining: deck,
+    playerUsernamesFinishedDiscarding: []
   }
 
   pokerRoundsIndex[chatId] = {
@@ -72,7 +160,13 @@ export const startPokerRound = (chatId: string, dealerUsername: string, playerUs
   return pokerRound
 }
 
-export const findPokerHand = (chatId: string, playerUsername: string): PokerHand | null => {
+type FoundPokerHand = {
+  dealerUsername: string
+  pokerHand: PokerHand
+  pokerHandIndex: number
+} | null
+
+export const findPokerHand = (chatId: string, playerUsername: string): FoundPokerHand => {
   const pokerRounds = pokerRoundsIndex[chatId]
   if (!pokerRounds) {
     console.log(`No poker rounds found for chatId: ${chatId}`)
@@ -81,9 +175,13 @@ export const findPokerHand = (chatId: string, playerUsername: string): PokerHand
 
   for (const dealerUsername in pokerRounds) {
     const pokerRound = pokerRounds[dealerUsername]
-    const playerHand = pokerRound.pokerHands.find(hand => hand.username === playerUsername)
-    if (playerHand) {
-      return playerHand
+    const pokerHandIndex = pokerRound.pokerHands.findIndex(pokerHand => pokerHand.username === playerUsername);
+    if (pokerHandIndex !== -1) {
+      return {
+        dealerUsername,
+        pokerHand: pokerRound.pokerHands[pokerHandIndex],
+        pokerHandIndex
+      }
     }
   }
 
@@ -98,7 +196,7 @@ export const sendPokerHand = async (chat_id: string, pokerHand: PokerHand) => {
 
 const generatePokerHandImage = async (chat_id: string, pokerHand: PokerHand) => {
   const canvasPath = path.join(__dirname, '../../assets/games/poker/poker_hand_canvas.png')
-  const compositeOperations = pokerHand.hand.map((card, index) => {
+  const compositeOperations = pokerHand.pokerHand.map((card, index) => {
     const cardImagePath = path.join(__dirname, `../../assets/games/poker/${card.suit.toLowerCase()}_${card.rank.toLowerCase()}.png`)
     return {
       input: cardImagePath,
@@ -116,4 +214,11 @@ const generatePokerHandImage = async (chat_id: string, pokerHand: PokerHand) => 
 
   const imageUrl = config.BOT_APP_ORIGIN + '/' + imagePath
   return imageUrl
+}
+
+export const getDiscardPositions = (req: Request) => {
+  const commandMessage = req.body.message.text
+  const parts = commandMessage.split(' ').map(part => parseInt(part)).filter(part => !isNaN(part))
+  const discardPositions = parts.filter(number => number >= 1 && number <= 5)
+  return discardPositions as PokerDiscardPosition[]
 }
