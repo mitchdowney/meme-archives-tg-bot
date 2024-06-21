@@ -81,7 +81,7 @@ export const sendMessage = async (chat_id: string, text: string, options?: SendM
 }
 
 export const sendImage = async (chat_id: string, imageUrl: string, shouldCheckAndRetry?: boolean,
-  text?: string, spoiler = false, options?: SendMessageOptions) => {
+  text?: string, has_spoiler = false, options?: SendMessageOptions) => {
   if (shouldCheckAndRetry) {
     for (let i = 0; i < 5; i++) {
       try {
@@ -107,7 +107,7 @@ export const sendImage = async (chat_id: string, imageUrl: string, shouldCheckAn
         photo: imageUrl,
         ...(text ? { caption: text } : {}),
         ...(options ? options : {}),
-        spoiler
+        has_spoiler
       }
     })
   } catch (error) {
@@ -118,7 +118,7 @@ export const sendImage = async (chat_id: string, imageUrl: string, shouldCheckAn
       ...(shouldCheckAndRetry ? { shouldCheckAndRetry } : {}),
       ...(text ? { caption: text } : {}),
       ...(options ? options : {}),
-      spoiler
+      has_spoiler
     })    
   }
 }

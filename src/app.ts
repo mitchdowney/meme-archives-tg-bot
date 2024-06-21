@@ -438,8 +438,8 @@ const webhookHandlers = {
     const pokerRound = startPokerRound(chat_id, dealerUserName, [dealerUserName, ...playerUserNames.slice(0, 4)])
     if (pokerRound) {
       for (const pokerHand of pokerRound.pokerHands) {
-        const spoiler = true
-        await sendPokerHand(chat_id, pokerHand, spoiler)
+        const has_spoiler = true
+        await sendPokerHand(chat_id, pokerHand, has_spoiler)
       }
     }
   },
