@@ -25,7 +25,6 @@ type PokerRound = {
   dealerUsername: string
   playerUsernames: string[]
   pokerHands: PokerHand[]
-  pokerDiscards: PokerHand[]
   deckRemaining: PokerCard[]
   playerUsernamesFinishedDiscarding: string[]
 }
@@ -74,7 +73,7 @@ export const pokerRedrawCardsForPlayer = (chatId: string, playerUsername: string
     if (pokerRound?.deckRemaining?.length > 0) {
       const newCard = pokerRound.deckRemaining.shift()
       if (newCard) {
-        pokerHand[deckIndex] = newCard
+        pokerHand.pokerHand[deckIndex] = newCard
       }
     }
   })
@@ -147,7 +146,6 @@ export const startPokerRound = (chatId: string, dealerUsername: string, playerUs
     dealerUsername,
     playerUsernames,
     pokerHands,
-    pokerDiscards: [],
     deckRemaining: deck,
     playerUsernamesFinishedDiscarding: []
   }
