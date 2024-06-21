@@ -444,7 +444,9 @@ const webhookHandlers = {
       const allPlayersHaveDiscarded = checkIfAllPlayersHaveDiscarded(pokerRound)
       if (allPlayersHaveDiscarded) {
         await dealFinalPokerHands(pokerRound)
-        await sendPokerHandWinner(pokerRound)
+        if (pokerRound.pokerHands.length > 1) {
+          await sendPokerHandWinner(pokerRound)
+        }
       }
     }
   }
