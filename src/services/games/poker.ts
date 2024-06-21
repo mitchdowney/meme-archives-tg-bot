@@ -5,7 +5,7 @@ import { sendImage, sendMessage } from '../telegram'
 
 const sharp = require('sharp')
 const path = require('path')
-const HandSolver = require('pokersolver').Hand;
+const HandSolver = require('pokersolver').Hand
 
 type PokerRank = '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'jack' | 'queen' | 'king' | 'ace' | 'joker'
 
@@ -100,15 +100,22 @@ export const dealFinalPokerHands = async (pokerRound: PokerRound) => {
 
 export const sendPokerHandWinner = async (pokerRound: PokerRound) => {
   const pokerHands = pokerRound.pokerHands
-  const winningHand = pokerHands.reduce((prevPokerHand, currentPokerHand) => {
-    const prevHand = convertHandToPokerSolverHand(prevPokerHand)
-    const currentHand = convertHandToPokerSolverHand(currentPokerHand)
-    const prevHandRank = HandSolver.solve(prevHand).rank
-    const currentHandRank = HandSolver.solve(currentHand).rank
-    return prevHandRank > currentHandRank ? prevPokerHand : currentPokerHand
+  let highestRank = -1
+  const handsWithRanks = pokerHands.map(pokerHand => {
+    const hand = convertHandToPokerSolverHand(pokerHand)
+    const handRank = HandSolver.solve(hand).rank
+    highestRank = Math.max(highestRank, handRank)
+    return { ...pokerHand, rank: handRank }
   })
 
-  await sendMessage(pokerRound.chatId, `@${winningHand.username} wins!`)
+  const winningHands = handsWithRanks.filter(hand => hand.rank === highestRank)
+
+  if (winningHands.length === 1) {
+    await sendMessage(pokerRound.chatId, `@${winningHands[0].username} wins! 🎉`)
+  } else {
+    const winnerUsernames = winningHands.map(hand => `@${hand.username}`).join(', ')
+    await sendMessage(pokerRound.chatId, `It's a tie! The winners are ${winnerUsernames} 🎉`)
+  }
 }
 
 const removeExistingRoundsWithUsernames = (chatId: string, playerUsernames: string[]) => {
@@ -186,7 +193,7 @@ export const findPokerHand = (chatId: string, playerUsername: string): FoundPoke
 
   for (const dealerUsername in pokerRounds) {
     const pokerRound = pokerRounds[dealerUsername]
-    const pokerHandIndex = pokerRound.pokerHands.findIndex(pokerHand => pokerHand.username === playerUsername);
+    const pokerHandIndex = pokerRound.pokerHands.findIndex(pokerHand => pokerHand.username === playerUsername)
     if (pokerHandIndex !== -1) {
       return {
         dealerUsername,
