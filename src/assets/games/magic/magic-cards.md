@@ -1,0 +1,268 @@
+# Magic Card Rules
+
+## Set Rules
+
+Colors:
+- Black (B)
+- Blue (U)
+- Green (G)
+- Red (R)
+- White (W)
+
+Lands:
+- Swamp (B)
+- Island (U)
+- Forest (G)
+- Mountain (R)
+- Plains (W)
+
+Artifacts:
+- 3 artifacts, 1-3 mana
+
+Every color should have an equal number of cards.
+
+- 4 daumens, 1-4 mana (non legendary)
+- 1 legendary daumen, 5 mana
+- 1 instant
+- 1 sorcery
+- 1 enchant daumen
+- 1 enchantment
+- total mana cost of each color set should be 22-24m.
+
+Multicolor
+
+## Card List
+
+- **Colorless**
+  - artifact 1m 1
+    - Name: Finger Trap
+    - Abilities: 1, T: Tap target daumen. Destroy Finger Trap.
+    - Image: /chinese-finger-trap
+  - artifact 2m 2
+    - Name: Trampoline
+    - Abilities: 1, T: Target daumen gains flying until end of turn.
+  - artifact 3m 3
+    - Name: Weight Room
+    - Abilities: 1, T: Add a +1/+1 counter to target daumen.
+    - Image: /banana-zone
+  - artifact 4m 4
+    - Name: Art Gallery
+    - Abilities: 4, T: Draw one card.
+
+- **Multicolor**
+  - creature legendary 5m 3GW
+    - Name: Angel Harambe
+    - Stats: 5/5
+    - Abilities: Flying. Attacking does not cause Angel Harambe to tap.
+    - Image: /harambe-in-heaven
+  - creature legendary 5m 3UW
+    - Name: Penguin Curator
+    - Stats: 4/4
+    - Abilities: W: Prevent 1 damage for a target. B,T: Draw 2 cards. Put one in your hand, and the other at the bottom of your deck.
+    - Image: /penguin-curator-mog-gme
+  - creature legendary 5m 3BR
+    - Name: Kook
+    - Stats: 4/4
+    - Abilities: B: Target creature gets -1 attack until end of turn. R,T: Deal 2 damage to target daumen or player.
+    - Image: /kook
+  - creature legendary 5m 3RW
+    - Name: CryptoWasta
+    - Stats: 4/4
+    - Abilities: 1R: Add a 1/1 red daumen with haste to your side of the battlefield.
+    - Image: /crypto-wasta
+  - creature legendary 5m BUGRW
+    - Name: Elon
+    - Stats: 4/4
+    - Abilities: When Elon is summoned, add 2 4/4 Tesla Roadster artifacts with haste to your side of the battlefield.
+    - Image: /elon
+  - instant 2m UG
+    - Name: Mog
+    - Abilities: Target daumen gets -3/-3 until end of turn.
+    - Image: /mog
+
+- **Black**
+  - creature 1m B
+    - Name: Wisp
+    - Stats: 0/1
+    - Abilities: Flying, B: Regenerate
+    - Image: /bitcoin
+  - creature 2m 1B
+    - Name: Skeleton
+    - Stats: 1/1
+    - Abilities: B: Regenerate
+    - Image: /wizard-of-soho
+  - creature 3m 2B
+    - Name: Witch
+    - Stats: 2/2
+    - Abilities: Flying. Whenever Witch deals damage to a player, that player discards a card.
+    - Image: /witch
+  - creature 4m 3B
+    - Name: Raver
+    - Stats: 1/2
+    - Abilities: M: Add +1/+1 to Raver until end of turn.
+    - Image: /rave-guy
+  - creature legendary 5m 3BB
+    - Name: Cold XYZ
+    - Stats: 4/4
+    - Abilities: All your other daumen get +1/+1.
+    - Image: /cold
+  - instant 2m 1B
+    - Name: Backstab
+    - Abilities: Destroy target daumen.
+    - Image: /backstab-hug
+  - sorcery 1m B
+    - Name: Raise Dead
+    - Abilities: Return a daumen from your graveyard to your hand.
+    - Image: /the-king-is-back
+  - enchant creature 1m B
+    - Name: Weakness
+    - Abilities: Target creature gets -2/-1.
+    - Image: /hospital
+  - enchantment 4m 3B
+    - Name: Greed
+    - Abilities: B + Pay 2 life: Draw a card.
+    - Image: /gucci
+  - total mana: 23m
+
+- **Blue**
+  - creature 1m U
+    - Name: Island Girl
+    - Stats: 1/2
+    - Image: /island-girl
+  - creature 2m 1U
+    - Name: Mermaid King
+    - Stats: 2/2
+    - Abilities: All Island Girls gain +1/+1.
+    - Image: /mermaid-king
+  - creature 3m 2U
+    - Name: Sorceror
+    - Stats: 1/1
+    - Abilities: T: Deal 1 damage to creature or player.
+    - Image: /cryptowizardd
+  - creature 4m 3U
+    - Name: Cloud Spirit
+    - Stats: 3/3
+    - Abilities: Flying
+    - Image: /in-the-clouds
+  - creature legendary 5m 3UU
+    - Name: PattyIce
+    - Stats: 4/4
+    - Abilities: All your other daumen get +1/+1.
+    - Image: /patty-ice
+  - instant 2m UU
+    - Name: Counterspell
+    - Abilities: Counter target spell.
+    - Image: /hammer
+  - sorcery 2m 2UU
+    - Name: Focus
+    - Abilities: Draw 3 cards.
+    - Image: /mirror
+  - enchant creature 4m 2UU
+    - Name: Hypnotize
+    - Abilities: Gain control of daumen.
+    - Image: /hyponotize
+  - enchantment (none)
+  - Total mana: 23m
+
+- **Green**
+  - creature 1m G
+    - Name: Fairy
+    - Stats: 1/1
+    - Abilities: Flying
+    - Image: /tinkerbell
+  - creature 2m 1G
+    - Name: Standing Cat
+    - Stats: 2/2
+    - Abilities: Can block as though it had flying.
+    - Image: /standing-cat
+  - creature 3m 2G
+    - Name: Majestic Daumen
+    - Stats: 2/3
+    - Abilities: Gain 2 life.
+    - Image: /majestic-daumen
+  - creature 4m 3G
+    - Name: Dinosaur
+    - Stats: 3/4
+    - Abilities: Trample
+    - Image: /dinosaur
+  - legendary creature 5m 3GG
+    - Name: Steki
+    - Stats: 4/4
+    - Abilities: All your other daumen get +1/+1.
+    - Image: /steki
+  - instant 1m G
+    - Name: Giant Growth
+    - Abilities: Add +3/+3 to creature until end of turn.
+    - Image: /giant-daumen
+  - sorcery 3m 2G
+    - Name: Nature's Bounty
+    - Abilities: Search your library for a basic land card and put it onto the battlefield. Then shuffle your library.
+    - Image: /trees-2
+  - enchant creature 2m 1G
+    - Name: Regeneration
+    - Abilities: Regenerate target creature regeneration enchants.
+    - Image: /trippy-farm
+  - enchantment 3m 2G
+    - Name: Garden of Eden
+    - Abilities: At the beginning of your turn, put a 1/1 green daumen onto the battlefield.
+    - Image: /garden-of-eden
+  - Total mana: 24m
+
+- **Red**
+  - creature 1m R
+    - Name: Angry Villager
+    - Stats: 0/1
+    - Abilities: Gain +1/+0 for each Angry Villager in play.
+    - Image: /angry-villager
+  - creature 2m 1R
+    - Name: Raider
+    - Stats: 1/1
+    - Abilities: Haste. When summoned deal 2 damage to target. Must attack each turn if able.
+    - Image: /rocket-launcher
+  - creature 3m 2R
+    - Name: Gladiator
+    - Stats: 2/3
+    - Abilities: Trample
+    - Image: /gladiator-2
+  - creature 4
+    - Name: Ninja
+    - Stats: 3/3
+    - Abilities: First Strike
+    - Image: /ninja-3
+  - legendary creature 5m 3RR
+    - Name: Ethereum Habibi
+    - Stats: 4/4
+    - Abilities: All your other daumen get +1/+1.
+    - Image: /ethereum-habibi
+  - instant 1m R
+    - Name: Fireball
+    - Abilities: Deal 3 damage to daumen or player.
+    - Image: /this-is-fine
+  - sorcery 2m 1R
+    - Name: Detonate
+    - Abilities: Destroy target artifact. It deals 2 damage to that artifact's owner.
+    - Image: /ozymandias
+  - enchant creature 1m R
+    - Name: Burning Rage
+    - Abilities: M: Enchanted daumen gets +1/+0 until end of turn.
+    - Image: /burning-rage
+  - enchantment 3m 2R
+    - Name: Drought
+    - Abilities: Deal 1 damage to your opponent at the beginning of each turn.
+    - Image: /pablo-escobar-pool
+  - total mana: 22m
+
+- **White**
+  - creature 1
+  - creature 2
+  - creature 3
+  - creature 4
+  - legendary creature 5m 3WW
+    - Name: The Pope
+    - Stats: 4/4
+    - Abilities: All your other daumen get +1/+1.
+    - Image: /the-pope
+  - instant 2
+  - sorcery 3
+  - enchant creature 2
+  - enchantment 1
