@@ -48,6 +48,7 @@ Multicolor
   - artifact 4m 4
     - Name: Art Gallery
     - Abilities: 4, T: Draw one card.
+    - Image: https://daumen.gallery/art-gallery
 
 - **Multicolor**
   - creature legendary 5m 3GW
@@ -91,7 +92,7 @@ Multicolor
     - Stats: 1/1
     - Abilities: B: Regenerate
     - Image: https://daumen.gallery/wizard-of-soho
-  - creature 3m 2B
+  - creature 3m 1BB
     - Name: Witch
     - Stats: 2/2
     - Abilities: Flying. Whenever Witch deals damage to a player, that player discards a card.
