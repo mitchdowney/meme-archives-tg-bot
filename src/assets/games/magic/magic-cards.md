@@ -136,7 +136,7 @@ Multicolor
     - Image: https://daumen.gallery/mermaid-king
   - creature 3m 2U
     - Name: Sorceror
-    - Stats: 1/1
+    - Stats: 1/2
     - Abilities: T: Deal 1 damage to creature or player.
     - Image: https://daumen.gallery/cryptowizardd
   - creature 4m 3U
