@@ -27,7 +27,7 @@ Every color should have an equal number of cards.
 - 1 sorcery
 - 1 enchant daumen
 - 1 enchantment
-- total mana cost of each color set should be 22-24m.
+- total mana cost of each color set should be 22-25m.
 
 Multicolor
 
@@ -127,9 +127,9 @@ Multicolor
 - **Blue**
   - creature 1m U
     - Name: Island Girl
-    - Stats: 1/2
+    - Stats: 1/1
     - Image: /island-girl
-  - creature 2m 1U
+  - creature 2m UU
     - Name: Mermaid King
     - Stats: 2/2
     - Abilities: All Island Girls gain +1/+1.
@@ -141,7 +141,7 @@ Multicolor
     - Image: /cryptowizardd
   - creature 4m 3U
     - Name: Cloud Spirit
-    - Stats: 3/3
+    - Stats: 2/4
     - Abilities: Flying
     - Image: /in-the-clouds
   - creature legendary 5m 3UU
@@ -172,12 +172,12 @@ Multicolor
     - Image: /tinkerbell
   - creature 2m 1G
     - Name: Standing Cat
-    - Stats: 2/2
+    - Stats: 2/3
     - Abilities: Can block as though it had flying.
     - Image: /standing-cat
   - creature 3m 2G
     - Name: Majestic Daumen
-    - Stats: 2/3
+    - Stats: 3/2
     - Abilities: Gain 2 life.
     - Image: /majestic-daumen
   - creature 4m 3G
@@ -202,16 +202,16 @@ Multicolor
     - Name: Regeneration
     - Abilities: Regenerate target creature regeneration enchants.
     - Image: /trippy-farm
-  - enchantment 3m 2G
+  - enchantment 4m 2GG
     - Name: Garden of Eden
     - Abilities: At the beginning of your turn, put a 1/1 green daumen onto the battlefield.
     - Image: /garden-of-eden
-  - Total mana: 24m
+  - Total mana: 25m
 
 - **Red**
   - creature 1m R
     - Name: Angry Villager
-    - Stats: 0/1
+    - Stats: 1/1
     - Abilities: Gain +1/+0 for each Angry Villager in play.
     - Image: /angry-villager
   - creature 2m 1R
@@ -221,7 +221,7 @@ Multicolor
     - Image: /rocket-launcher
   - creature 3m 2R
     - Name: Gladiator
-    - Stats: 2/3
+    - Stats: 3/2
     - Abilities: Trample
     - Image: /gladiator-2
   - creature 4
@@ -253,16 +253,44 @@ Multicolor
   - total mana: 22m
 
 - **White**
-  - creature 1
-  - creature 2
+  - creature 1 W
+    - Name: Guard
+    - Stats: 1/1
+    - Abilities: W: Gain +0/+1 until end of turn.
+    - Image: /soldier-2
+  - creature 2 WW
+    - Name: Archer
+    - Stats: 2/2
+    - Abilities: First strike. Can block creatures with flying.
+    - Image: ???
   - creature 3
+    - Name: Monk
+    - Abilities: When Monk enters the battlefield, gain 2 life.
+    - Stats: 2/3
+    - Image: ???
   - creature 4
+    - Name: Angel
+    - Stats: 3/3
+    - Abilities: Flying. Attacking does not cause Angel to tap.
+    - Image: /victorias-secret-angel
   - legendary creature 5m 3WW
     - Name: The Pope
     - Stats: 4/4
     - Abilities: All your other daumen get +1/+1.
     - Image: /the-pope
-  - instant 2
-  - sorcery 3
-  - enchant creature 2
-  - enchantment 1
+  - instant 1m 1W
+    - Name: Disenchant
+    - Abilities: Destroy target artifact or enchantment.
+    - Image: ???
+  - sorcery 2m 1W
+    - Name: Healing Drink
+    - Abilities: Gain 4 life.
+    - Image: /red-bull
+  - enchant creature 2m WW
+    - Name: Blessing
+    - Abilities: W: Target creature blessing enchants gains +1/+1.
+    - Image: ???
+  - enchantment 3m 2W
+    - Name: Castle
+    - Abilities: Untapped creatures get +0/+1.
+    - Image: ???
