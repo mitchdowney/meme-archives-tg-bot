@@ -41,6 +41,7 @@ Multicolor
   - artifact 2m 2
     - Name: Trampoline
     - Abilities: 1, T: Target daumen gains flying until end of turn.
+    - Image: https://daumen.gallery/trampoline
   - artifact 3m 3
     - Name: Weight Room
     - Abilities: 1, T: Add a +1/+1 counter to target daumen.
@@ -53,8 +54,8 @@ Multicolor
 - **Multicolor**
   - creature legendary 5m 3GW
     - Name: Angel Harambe
-    - Stats: 5/5
-    - Abilities: Flying. Attacking does not cause Angel Harambe to tap.
+    - Stats: 4/4
+    - Abilities: Flying. Attacking does not cause Angel Harambe to tap. Can block any number of daumen.
     - Image: https://daumen.gallery/harambe-in-heaven
   - creature legendary 5m 3UW
     - Name: Penguin Curator
@@ -64,7 +65,7 @@ Multicolor
   - creature legendary 5m 3BR
     - Name: Kook
     - Stats: 4/4
-    - Abilities: B: Target creature gets -1 attack until end of turn. R,T: Deal 2 damage to target daumen or player.
+    - Abilities: B: Target daumen gets -1 attack until end of turn. R,T: Deal 2 damage to target daumen or player.
     - Image: https://daumen.gallery/kook
   - creature legendary 5m 3RW
     - Name: CryptoWasta
@@ -117,7 +118,7 @@ Multicolor
     - Image: https://daumen.gallery/the-king-is-back
   - enchant creature 1m B
     - Name: Weakness
-    - Abilities: Target creature gets -2/-1.
+    - Abilities: Target daumen gets -2/-1.
     - Image: https://daumen.gallery/hospital
   - enchantment 4m 3B
     - Name: Greed
@@ -138,7 +139,7 @@ Multicolor
   - creature 3m 2U
     - Name: Sorceror
     - Stats: 1/2
-    - Abilities: T: Deal 1 damage to creature or player.
+    - Abilities: T: Deal 1 damage to daumen or player.
     - Image: https://daumen.gallery/cryptowizardd
   - creature 4m 3U
     - Name: Cloud Spirit
@@ -193,7 +194,7 @@ Multicolor
     - Image: https://daumen.gallery/steki
   - instant 1m G
     - Name: Giant Growth
-    - Abilities: Add +3/+3 to creature until end of turn.
+    - Abilities: Add +3/+3 to daumen until end of turn.
     - Image: https://daumen.gallery/giant-daumen
   - sorcery 3m 2G
     - Name: Nature's Bounty
@@ -201,7 +202,7 @@ Multicolor
     - Image: https://daumen.gallery/trees-2
   - enchant creature 2m 1G
     - Name: Regeneration
-    - Abilities: Regenerate target creature regeneration enchants.
+    - Abilities: Regenerate target daumen regeneration enchants.
     - Image: https://daumen.gallery/trippy-farm
   - enchantment 4m 2GG
     - Name: Garden of Eden
@@ -262,7 +263,7 @@ Multicolor
   - creature 2 WW
     - Name: Archer
     - Stats: 2/2
-    - Abilities: First strike. Can block creatures with flying.
+    - Abilities: First strike. Can block daumens with flying.
     - Image: ???
   - creature 3
     - Name: Monk
@@ -289,9 +290,9 @@ Multicolor
     - Image: https://daumen.gallery/red-bull
   - enchant creature 2m WW
     - Name: Blessing
-    - Abilities: W: Target creature blessing enchants gains +1/+1.
+    - Abilities: W: Target daumen blessing enchants gains +1/+1.
     - Image: ???
   - enchantment 3m 2W
     - Name: Castle
-    - Abilities: Untapped creatures get +0/+1.
+    - Abilities: Untapped daumens get +0/+1.
     - Image: ???
