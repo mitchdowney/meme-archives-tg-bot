@@ -33,6 +33,8 @@ Multicolor
 
 ## Card List
 
+### 1st Edition
+
 - **Colorless**
   - artifact 1m 1
     - Name: Finger Trap
@@ -48,29 +50,29 @@ Multicolor
     - Image: https://daumen.gallery/banana-zone
   - artifact 4m 4
     - Name: Art Gallery
-    - Abilities: 4, T: Draw one card.
+    - Abilities: 3, T: Draw one card.
     - Image: https://daumen.gallery/art-gallery
 
 - **Multicolor**
   - creature legendary 5m 3GW
     - Name: Angel Harambe
     - Stats: 4/4
-    - Abilities: Flying. Attacking does not cause Angel Harambe to tap. Can block any number of daumen.
+    - Abilities: Flying. Attacking does not cause Angel Harambe to tap.
     - Image: https://daumen.gallery/harambe-in-heaven
   - creature legendary 5m 3UW
     - Name: Penguin Curator
     - Stats: 4/4
-    - Abilities: W: Prevent 1 damage for a target. B,T: Draw 2 cards. Put one in your hand, and the other at the bottom of your deck.
+    - Abilities: B,T: Draw 2 cards. Put one in your hand, and the other at the bottom of your deck. W: Prevent 1 damage to a daumen or player. 
     - Image: https://daumen.gallery/penguin-curator-mog-gme
   - creature legendary 5m 3BR
     - Name: Kook
     - Stats: 4/4
-    - Abilities: B: Target daumen gets -1 attack until end of turn. R,T: Deal 2 damage to target daumen or player.
+    - Abilities: B: Target daumen gets -1/-0 until end of turn. R,T: Deal 2 damage to daumen or player.
     - Image: https://daumen.gallery/kook
-  - creature legendary 5m 3RW
+  - creature legendary 5m 3RB
     - Name: CryptoWasta
     - Stats: 4/4
-    - Abilities: 1R: Add a 1/1 red daumen with haste to your side of the battlefield.
+    - Abilities: 1R: Add a 1/1 red daumen with haste to your side of the battlefield. 1W, T: Destroy target artifact or enchantment.
     - Image: https://daumen.gallery/crypto-wasta
   - creature legendary 5m BUGRW
     - Name: Elon
@@ -107,7 +109,7 @@ Multicolor
     - Name: Cold XYZ
     - Stats: 4/4
     - Abilities: All your other daumen get +1/+1.
-    - Image: https://daumen.gallery/cold
+    - Image: https://daumen.gallery/cold-xyz
   - instant 2m 1B
     - Name: Backstab
     - Abilities: Destroy target daumen.
@@ -129,7 +131,7 @@ Multicolor
 - **Blue**
   - creature 1m U
     - Name: Island Girl
-    - Stats: 1/1
+    - Stats: 1/2
     - Image: https://daumen.gallery/island-girl
   - creature 2m UU
     - Name: Mermaid King
@@ -175,7 +177,7 @@ Multicolor
   - creature 2m 1G
     - Name: Standing Cat
     - Stats: 2/3
-    - Abilities: Can block as though it had flying.
+    - Abilities: Can block as though it has flying.
     - Image: https://daumen.gallery/standing-cat
   - creature 3m 2G
     - Name: Majestic Daumen
@@ -204,11 +206,11 @@ Multicolor
     - Name: Regeneration
     - Abilities: Regenerate target daumen regeneration enchants.
     - Image: https://daumen.gallery/trippy-farm
-  - enchantment 4m 2GG
+  - enchantment 3m 1GG
     - Name: Garden of Eden
     - Abilities: At the beginning of your turn, put a 1/1 green daumen onto the battlefield.
-    - Image: https://daumen.gallery/garden-of-eden
-  - Total mana: 25m
+    - Image: https://daumen.gallery/the-garden-of-eden
+  - Total mana: 24m
 
 - **Red**
   - creature 1m R
@@ -219,7 +221,7 @@ Multicolor
   - creature 2m 1R
     - Name: Raider
     - Stats: 1/1
-    - Abilities: Haste. When summoned deal 2 damage to target. Must attack each turn if able.
+    - Abilities: Haste. When summoned deal 2 damage to target daumen or player.
     - Image: https://daumen.gallery/rocket-launcher
   - creature 3m 2R
     - Name: Gladiator
@@ -242,15 +244,15 @@ Multicolor
     - Image: https://daumen.gallery/this-is-fine
   - sorcery 2m 1R
     - Name: Detonate
-    - Abilities: Destroy target artifact. It deals 2 damage to that artifact's owner.
+    - Abilities: Destroy target artifact. It deals 2 damage to it's owner.
     - Image: https://daumen.gallery/ozymandias
   - enchant creature 1m R
     - Name: Burning Rage
     - Abilities: M: Enchanted daumen gets +1/+0 until end of turn.
     - Image: https://daumen.gallery/burning-rage
-  - enchantment 3m 2R
+  - enchantment 2m RR
     - Name: Drought
-    - Abilities: Deal 1 damage to your opponent at the beginning of each turn.
+    - Abilities: At the beginning of your turn, deal 1 damage to all players and daumen.
     - Image: https://daumen.gallery/pablo-escobar-pool
   - total mana: 22m
 
@@ -278,14 +280,14 @@ Multicolor
   - legendary creature 5m 3WW
     - Name: The Pope
     - Stats: 4/4
-    - Abilities: All your other daumen get +1/+1.
+    - Abilities: All your other daumen get +1/+1. W, T: Gain 4 life.
     - Image: https://daumen.gallery/the-pope
   - instant 1m 1W
     - Name: Disenchant
     - Abilities: Destroy target artifact or enchantment.
     - Image: ???
   - sorcery 2m 1W
-    - Name: Healing Drink
+    - Name: Healing Nectar
     - Abilities: Gain 4 life.
     - Image: https://daumen.gallery/red-bull
   - enchant creature 2m WW
