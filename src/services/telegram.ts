@@ -249,11 +249,16 @@ export const createCommandParser = (
   }
 
   return (commandText: string) => {
-    if (!commandPrefixes.some(prefix => commandText.startsWith(prefix) && commandText[prefix.length] === ' ')) {
+    const commandPosition = commandPrefixes
+      .map(prefix => commandText.indexOf(prefix + ' '))
+      .find(position => position !== -1)
+
+    if (commandPosition === undefined) {
       throw new Error('Invalid command')
     }
 
-    const parts = commandText.split(/ -(?=\w)/).slice(1)
+    const parts = commandText.substring(commandPosition).split(/ -(?=\w)/).slice(1)
+
     let parsedCommand
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

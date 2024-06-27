@@ -112,7 +112,7 @@ const startApp = async () => {
           }
           
           for (const [command, handler] of Object.entries(commands)) {
-            if (new RegExp(`^${command}( |@${config.BOT_USER_NAME})?.*$`).test(commandText)) {
+            if (new RegExp(`${command}( |@${config.BOT_USER_NAME})?.*$`).test(commandText)) {
               await handler(req)
               // return so that the command is not checked against the tagCommandsIndex
               return
