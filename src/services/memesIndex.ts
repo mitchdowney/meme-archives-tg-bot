@@ -23,11 +23,12 @@ export const updateTagCommandsIndex = async (groupChatId: number) => {
 }
 
 export const getMatchingTagTitleFromTagCommandsIndex = (groupChatId: number, commandText: string) => {
-  const commandPrefix = commandText.split(' ')[0]
-  if (commandPrefix.startsWith('/')) {
+  const match = commandText.match(/\/(\w+)/)
+  const parsedCommand = match ? match[1] : null
+  if (parsedCommand) {
     const tagsCommandsIndex = tagsCommandsIndexes[groupChatId]
-    const parsedCommand = commandPrefix.substring(1)?.toLowerCase()
-    const tagTitle = tagsCommandsIndex[parsedCommand]
+    const parsedCommandLowerCase = parsedCommand.toLowerCase()
+    const tagTitle = tagsCommandsIndex[parsedCommandLowerCase]
     return tagTitle
   }
 }
