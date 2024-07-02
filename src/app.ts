@@ -182,7 +182,7 @@ const webhookHandlers = {
     const first_name = req?.body?.message?.from?.first_name
     const username = req?.body?.message?.from?.username
     const randomPercent = Math.floor(Math.random() * 121) - 10
-    const text = `${first_name || username || ''} is ${randomPercent} daumen!`
+    const text = `${first_name || username || ''} is ${randomPercent}% daumen!`
     await sendMessage(chat_id, text)
   },
   galleryHello: async (req: Request) => {
