@@ -23,7 +23,7 @@ export const updateTagCommandsIndex = async (groupChatId: number) => {
 }
 
 export const getMatchingTagTitleFromTagCommandsIndex = (groupChatId: number, commandText: string) => {
-  const match = commandText.match(/\/(\w+)/)
+  const match = commandText.match(/(?:^|\s)\/(\w+)/)
   const parsedCommand = match ? match[1] : null
   if (parsedCommand) {
     const tagsCommandsIndex = tagsCommandsIndexes[groupChatId]
