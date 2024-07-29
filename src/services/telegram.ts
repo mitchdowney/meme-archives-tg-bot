@@ -306,6 +306,7 @@ export const parseUploadImageCommand = createCommandParser(
         .filter(Boolean)
     },
     s: (value, acc) => { acc.slug = value },
+    pb: (value, acc) => { acc.prevent_border_image = (value === 'true' || value === 't') },
   },
   []
 )
