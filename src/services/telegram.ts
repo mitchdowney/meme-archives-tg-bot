@@ -241,7 +241,7 @@ export const getImageFile = async (req: Request): Promise<ImageFile> => {
 export const createCommandParser = (
   commandPrefixes: string[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  keyHandlers: { [key: string]: (value: string, acc: any) => void },
+  keyHandlers: { [key: string]: (value: string | undefined, acc: any) => void },
   requiredKeys: string[]
 ) => {
   if (!keyHandlers || typeof keyHandlers !== 'object') {
@@ -249,42 +249,30 @@ export const createCommandParser = (
   }
 
   return (commandText: string) => {
-    const commandPosition = commandPrefixes
-      .map(prefix => commandText.indexOf(prefix + ' '))
-      .find(position => position !== -1)
-
-    if (commandPosition === undefined) {
-      throw new Error('Invalid command')
+    const commandPosition = commandPrefixes.findIndex(prefix => commandText.startsWith(prefix))
+    if (commandPosition === -1) {
+      return null
     }
 
-    const parts = commandText.substring(commandPosition).split(/ -(?=\w)/).slice(1)
+    const args = commandText.slice(commandPrefixes[commandPosition].length).trim().split(/\s+-/)
+    const acc: any = {}
 
-    let parsedCommand
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      parsedCommand = parts.reduce((acc: any, part) => {
-        const [key, ...values] = part.split(' ')
-        if (acc[key]) {
-          throw new Error(`Duplicate key: ${key}`)
-        }
-        const keyHandler = keyHandlers[key]
-        if (!keyHandler) {
-          throw new Error(`No handler for key: ${key}`)
-        }
-        keyHandler(values.join(' '), acc)
-        return acc
-      }, {})
+    for (const arg of args) {
+      const [key, ...valueParts] = arg.split(/\s+/)
+      const value = valueParts.join(' ') || undefined
 
-      for (const key of requiredKeys) {
-        if (!parsedCommand[key]) {
-          throw new Error(`The "${key}" parameter is required`)
-        }
+      if (keyHandlers[key]) {
+        keyHandlers[key](value, acc)
       }
-    } catch (error) {
-      throw new Error(error)
     }
 
-    return parsedCommand
+    for (const requiredKey of requiredKeys) {
+      if (acc[requiredKey] === undefined) {
+        throw new Error(`Missing required key: ${requiredKey}`)
+      }
+    }
+
+    return acc
   }
 }
 
@@ -306,6 +294,7 @@ export const parseUploadImageCommand = createCommandParser(
         .filter(Boolean)
     },
     s: (value, acc) => { acc.slug = value },
+    pb: (value, acc) => { acc.prevent_border_image = true }
   },
   []
 )
