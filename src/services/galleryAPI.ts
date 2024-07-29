@@ -58,6 +58,7 @@ type GalleryUploadImage = {
     filename: string
     buffer: Buffer
   } | null
+  prevent_border_image?: boolean
 }
 
 const getContentTypeFromFilename = (filename: string) => {
@@ -82,7 +83,7 @@ const createImageFormData = (data: GalleryUploadImage, id?: number) => {
     tagTitles: JSON.stringify(data.tagTitles || []),
     artistNames: JSON.stringify(data.artistNames || []),
     slug: data.slug,
-    prevent_border_image: config.GALLERY_IMAGE_PREVENT_BORDER_IMAGE,
+    prevent_border_image: data.prevent_border_image || config.GALLERY_IMAGE_PREVENT_BORDER_IMAGE,
     preview_crop_position: config.GALLERY_IMAGE_PREVIEW_CROP_POSITION
   }
 
