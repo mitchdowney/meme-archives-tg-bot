@@ -300,13 +300,14 @@ const webhookHandlers = {
     const parsedCommand = parseUploadImageCommand(commandText)
     const imageUploadData = await getImageFile(req)
   
-    const { title, tagTitles, artistNames, slug } = parsedCommand
+    const { title, tagTitles, artistNames, slug, prevent_border_image } = parsedCommand
     
     const image = await galleryUploadImage({
       title,
       tagTitles,
       artistNames,
       slug,
+      prevent_border_image,
       imageUploadData
     })
 
@@ -328,7 +329,7 @@ const webhookHandlers = {
     const parsedCommand = parseEditImageCommand(commandText)
     const imageUploadData = await getImageFile(req)
   
-    const { id: idOrSlug, title, tagTitles, artistNames, slug } = parsedCommand
+    const { id: idOrSlug, title, tagTitles, artistNames, slug, prevent_border_image } = parsedCommand
     
     const previousImageData = await galleryGetImage(idOrSlug)
 
@@ -341,6 +342,7 @@ const webhookHandlers = {
       ...(tagTitles?.length ? { tagTitles } : { tagTitles: previousTagTitles }),
       ...(artistNames?.length ? { artistNames } : { artistNames: previousArtistNames}),
       ...(slug ? { slug } : {}),
+      ...(prevent_border_image ? { prevent_border_image } : {}),
       imageUploadData
     })
 
