@@ -98,7 +98,7 @@ const startApp = async () => {
             '/get_image_meta': webhookHandlers.getImageMeta,
             '/get_image': webhookHandlers.getImage,
             '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
-            '/meme': webhookHandlers.getRandomImage,
+            '/painting': webhookHandlers.getRandomImage,
             '/my_id': webhookHandlers.myId,
             '/remove_image_background': webhookHandlers.removeImageBackground,
             '/random_image': webhookHandlers.getRandomImage,
