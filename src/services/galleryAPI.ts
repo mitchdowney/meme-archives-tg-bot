@@ -68,9 +68,10 @@ export const galleryGetImagesByArtist = async (artistSlug: string, total: number
     }
   )
 
-  const images = response.data?.slice(0, total)
+  const images = response.data?.[0] || []
+  const finalImages = images.slice(0, total)
 
-  return images
+  return finalImages
 }
 
 type GalleryUploadImage = {
