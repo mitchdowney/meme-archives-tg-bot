@@ -299,11 +299,11 @@ const webhookHandlers = {
     const images = await galleryGetImagesByArtist(artistName, total, sort)
 
     for (const image of images) {
-      await delay(timeOfIntervalInSeconds * 1000)
       const imageUrl = getAvailableImageUrl('no-border', image)
       if (imageUrl) {
         await sendImage(chat_id, imageUrl)
       }
+      await delay(timeOfIntervalInSeconds * 1000)
     }    
   },
   myId: async (req: Request) => {    
