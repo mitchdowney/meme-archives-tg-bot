@@ -50,8 +50,7 @@ export const galleryGetRandomImage = async (title?: string) => {
 }
 
 export const galleryGetImagesByArtist = async (artistSlug: string, total: number, sort: string) => {
-  const artistResponse = await galleryGetArtist(artistSlug)
-  const artist = artistResponse.data
+  const artist = await galleryGetArtist(artistSlug)
 
   if (!artist) {
     return []
