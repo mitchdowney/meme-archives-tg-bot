@@ -13,7 +13,7 @@ import { getArtistInfo, getArtistProfilePictureUrl, getAvailableImageUrl,
   getImageInfo } from './lib/galleryHelpers'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
-import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetRandomImage,
+import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetImagesByArtist, galleryGetRandomImage,
   galleryRemoveImageBackground, galleryUploadImage } from './services/galleryAPI'
 import { getChatId, getCommandText, getImageFile, getMentionedUserNames, getUserMention, getUserName,
   parseEditArtistCommand, parseEditImageCommand, parseUploadImageCommand, sendDocument, sendGalleryAdmin,
@@ -24,6 +24,7 @@ import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes,
   updateTagCommandsIndex } from './services/memesIndex'
 import { checkIfAllPlayersHaveDiscarded, dealFinalPokerHands, getDiscardPositions, pokerRedrawCardsForPlayer,
   sendPokerHand, sendPokerHandWinner, startPokerRound } from './services/games/poker'
+import { delay } from './lib/utility'
 
 const port = 9000
 
@@ -92,6 +93,7 @@ const startApp = async () => {
             '/edit_artist': webhookHandlers.editArtist,
             '/edit_image': webhookHandlers.editImage,
             '/ei': webhookHandlers.editImage,
+            '/feature_artist': webhookHandlers.featureArtist,
             '/gallery_admin': webhookHandlers.galleryAdmin,
             '/gallery_hello': webhookHandlers.galleryHello,
             '/gallery_standards': webhookHandlers.galleryStandards,
@@ -113,7 +115,7 @@ const startApp = async () => {
           }
           
           for (const [command, handler] of Object.entries(commands)) {
-            if (new RegExp(`(^|\\s)(?!.*\\bhttps?:\\/\\/\\b)${command}( |@${config.BOT_USER_NAME})?.*$`).test(commandText?.toLowerCase())) {
+            if (new RegExp(`(^|\\s)(?!.*\\bhttps?:\\/\\/\\b)${command}(\\s|@${config.BOT_USER_NAME}\\s|$)`).test(commandText?.toLowerCase())) {
               await handler(req)
               // return so that the command is not checked against the tagCommandsIndex
               return
@@ -286,6 +288,24 @@ const webhookHandlers = {
       await sendMessage(chat_id, text)
     }
   },
+  featureArtist: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const commandText = getCommandText(req)
+    const chat_id = req?.body?.message?.chat?.id
+    const artistName = commandText.split(' ')[1]
+    const total = commandText.split(' ')[2]
+    const timeOfIntervalInSeconds = commandText.split(' ')[3]
+    const sort = 'random'
+    const images = await galleryGetImagesByArtist(artistName, total, sort)
+
+    for (const image of images) {
+      await delay(timeOfIntervalInSeconds * 1000)
+      const imageUrl = getAvailableImageUrl('no-border', image)
+      if (imageUrl) {
+        await sendImage(chat_id, imageUrl)
+      }
+    }    
+  },
   myId: async (req: Request) => {    
     const chat_id = getChatId(req)
     sendMessage(chat_id, `Your Telegram ID is ${req?.body?.message?.from?.id}`)
@@ -310,13 +330,14 @@ const webhookHandlers = {
     const parsedCommand = parseUploadImageCommand(commandText)
     const imageUploadData = await getImageFile(req)
   
-    const { title, tagTitles, artistNames, slug } = parsedCommand
+    const { title, tagTitles, artistNames, slug, prevent_border_image } = parsedCommand
     
     const image = await galleryUploadImage({
       title,
       tagTitles,
       artistNames,
       slug,
+      prevent_border_image,
       imageUploadData
     })
 
@@ -338,7 +359,7 @@ const webhookHandlers = {
     const parsedCommand = parseEditImageCommand(commandText)
     const imageUploadData = await getImageFile(req)
   
-    const { id: idOrSlug, title, tagTitles, artistNames, slug } = parsedCommand
+    const { id: idOrSlug, title, tagTitles, artistNames, slug, prevent_border_image } = parsedCommand
     
     const previousImageData = await galleryGetImage(idOrSlug)
 
@@ -351,6 +372,7 @@ const webhookHandlers = {
       ...(tagTitles?.length ? { tagTitles } : { tagTitles: previousTagTitles }),
       ...(artistNames?.length ? { artistNames } : { artistNames: previousArtistNames}),
       ...(slug ? { slug } : {}),
+      ...(prevent_border_image ? { prevent_border_image } : {}),
       imageUploadData
     })
 

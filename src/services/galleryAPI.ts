@@ -49,6 +49,31 @@ export const galleryGetRandomImage = async (title?: string) => {
   return response.data
 }
 
+export const galleryGetImagesByArtist = async (artistSlug: string, total: number, sort: string) => {
+  const artistResponse = await galleryGetArtist(artistSlug)
+  const artist = artistResponse.data
+
+  if (!artist) {
+    return []
+  }
+
+  const response = await galleryAPIRequest(
+    'GET', 
+    '/images/by-artist',
+    {
+      params: {
+        id: artist.id,
+        page: 1,
+        sort
+      }
+    }
+  )
+
+  const images = response.data?.slice(0, total)
+
+  return images
+}
+
 type GalleryUploadImage = {
   title?: string
   tagTitles?: string
@@ -58,6 +83,7 @@ type GalleryUploadImage = {
     filename: string
     buffer: Buffer
   } | null
+  prevent_border_image?: boolean
 }
 
 const getContentTypeFromFilename = (filename: string) => {
@@ -82,7 +108,7 @@ const createImageFormData = (data: GalleryUploadImage, id?: number) => {
     tagTitles: JSON.stringify(data.tagTitles || []),
     artistNames: JSON.stringify(data.artistNames || []),
     slug: data.slug,
-    prevent_border_image: config.GALLERY_IMAGE_PREVENT_BORDER_IMAGE,
+    prevent_border_image: data.prevent_border_image ? 'true' : config.GALLERY_IMAGE_PREVENT_BORDER_IMAGE,
     preview_crop_position: config.GALLERY_IMAGE_PREVIEW_CROP_POSITION
   }
 
