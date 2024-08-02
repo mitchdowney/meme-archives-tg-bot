@@ -13,7 +13,7 @@ import { getArtistInfo, getArtistProfilePictureUrl, getAvailableImageUrl,
   getImageInfo } from './lib/galleryHelpers'
 import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
-import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetRandomImage,
+import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetImagesByArtist, galleryGetRandomImage,
   galleryRemoveImageBackground, galleryUploadImage } from './services/galleryAPI'
 import { getChatId, getCommandText, getImageFile, getMentionedUserNames, getUserMention, getUserName,
   parseEditArtistCommand, parseEditImageCommand, parseUploadImageCommand, sendDocument, sendGalleryAdmin,
@@ -24,6 +24,7 @@ import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes,
   updateTagCommandsIndex } from './services/memesIndex'
 import { checkIfAllPlayersHaveDiscarded, dealFinalPokerHands, getDiscardPositions, pokerRedrawCardsForPlayer,
   sendPokerHand, sendPokerHandWinner, startPokerRound } from './services/games/poker'
+import { delay } from './lib/utility'
 
 const port = 9000
 
@@ -91,6 +92,7 @@ const startApp = async () => {
             '/edit_artist': webhookHandlers.editArtist,
             '/edit_image': webhookHandlers.editImage,
             '/ei': webhookHandlers.editImage,
+            '/feature_artist': webhookHandlers.featureArtist,
             '/gallery_admin': webhookHandlers.galleryAdmin,
             '/gallery_hello': webhookHandlers.galleryHello,
             '/gallery_standards': webhookHandlers.galleryStandards,
@@ -277,6 +279,24 @@ const webhookHandlers = {
     } else {
       await sendMessage(chat_id, text)
     }
+  },
+  featureArtist: async (req: Request) => {
+    await checkIsGroupAdmin(req)
+    const commandText = getCommandText(req)
+    const chat_id = req?.body?.message?.chat?.id
+    const artistName = commandText.split(' ')[1]
+    const total = commandText.split(' ')[2]
+    const timeOfIntervalInSeconds = commandText.split(' ')[3]
+    const sort = 'random'
+    const images = await galleryGetImagesByArtist(artistName, total, sort)
+
+    for (const image of images) {
+      await delay(timeOfIntervalInSeconds * 1000)
+      const imageUrl = getAvailableImageUrl('no-border', image)
+      if (imageUrl) {
+        await sendImage(chat_id, imageUrl)
+      }
+    }    
   },
   myId: async (req: Request) => {    
     const chat_id = getChatId(req)

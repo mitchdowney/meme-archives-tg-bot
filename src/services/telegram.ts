@@ -177,6 +177,16 @@ export const sendGalleryAdmin = async (chat_id: string) => {
   return response.data
 }
 
+export const extractRepliedUsername = (req: Request): string | null => {
+  const message = req.body.message
+  
+  if (message && message.reply_to_message && message.reply_to_message.from) {
+    return message.reply_to_message.from.username || null
+  }
+  
+  return null
+}
+
 export const getUserMention = (username = '', userId = '') => {
   return username
     ? `@${username}`

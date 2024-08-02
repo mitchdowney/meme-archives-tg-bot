@@ -49,6 +49,31 @@ export const galleryGetRandomImage = async (title?: string) => {
   return response.data
 }
 
+export const galleryGetImagesByArtist = async (artistSlug: string, total: number, sort: string) => {
+  const artistResponse = await galleryGetArtist(artistSlug)
+  const artist = artistResponse.data
+
+  if (!artist) {
+    return []
+  }
+
+  const response = await galleryAPIRequest(
+    'GET', 
+    '/images/by-artist',
+    {
+      params: {
+        id: artist.id,
+        page: 1,
+        sort
+      }
+    }
+  )
+
+  const images = response.data?.slice(0, total)
+
+  return images
+}
+
 type GalleryUploadImage = {
   title?: string
   tagTitles?: string
