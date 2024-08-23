@@ -260,3 +260,14 @@ export const galleryRemoveImageBackground = async (imageIdOrSlug: string) => {
   const response = await galleryAPIAdminRequest('GET', `/rembg/${imageIdOrSlug}`)
   return response.data
 }
+
+export const downloadImageAsBuffer = async (imageUrl: string): Promise<Buffer> => {
+  try {
+    const response = await axios.get(imageUrl, {
+      responseType: 'arraybuffer'
+    })
+    return Buffer.from(response.data, 'binary')
+  } catch (error) {
+    throw new Error(`Failed to download image: ${error.message}`)
+  }
+}

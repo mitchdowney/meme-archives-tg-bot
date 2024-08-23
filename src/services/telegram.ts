@@ -10,7 +10,7 @@ import { Request } from 'express'
 
 import { config, telegramAPIBotFileUrl, telegramAPIBotUrl } from '../config'
 import { configText } from '../config/configurables'
-import { galleryCreateTelegramVideoFile, galleryGetImage, galleryGetTelegramVideoFile } from './galleryAPI'
+import { downloadImageAsBuffer, galleryCreateTelegramVideoFile, galleryGetImage, galleryGetTelegramVideoFile } from './galleryAPI'
 
 const telegramAPIRequest = async (
   path: string,
@@ -215,23 +215,25 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
       const image = await galleryGetImage(image_id.toString())
       if (image.has_video) {
         const videoUrl = `${config.GALLERY_IMAGE_BUCKET_ORIGIN}/${image_id}-video.mp4`
+        const videoBuffer = await downloadImageAsBuffer(videoUrl)
         const videoPath = `/tmp/${image_id}-video.mp4`
-        const videoBuffer = await telegramAPIFileRequest(videoUrl, {
-          responseType: 'arraybuffer'
-        })
-        fs.writeFileSync(videoPath, videoBuffer.data)
+        fs.writeFileSync(videoPath, videoBuffer)
+        
         const telegram_cached_file_id = await uploadVideoToCache(videoPath)
-        galleryCreateTelegramVideoFile(config.BOT_USER_NAME, image_id, telegram_cached_file_id)
+
+        await galleryCreateTelegramVideoFile(config.BOT_USER_NAME, image_id, telegram_cached_file_id)
+
         await sendVideoFromCache(chat_id, telegram_cached_file_id)
       } else if (image.has_animation) {
         const animationUrl = `${config.GALLERY_IMAGE_BUCKET_ORIGIN}/${image_id}-animation.gif`
+        const animationBuffer = await downloadImageAsBuffer(animationUrl)
         const animationPath = `/tmp/${image_id}-animation.gif`
-        const animationBuffer = await telegramAPIFileRequest(animationUrl, {
-          responseType: 'arraybuffer'
-        })
-        fs.writeFileSync(animationPath, animationBuffer.data)
+        fs.writeFileSync(animationPath, animationBuffer)
+        
         const telegram_cached_file_id = await uploadVideoToCache(animationPath)
-        galleryCreateTelegramVideoFile(config.BOT_USER_NAME, image_id, telegram_cached_file_id)
+
+        await galleryCreateTelegramVideoFile(config.BOT_USER_NAME, image_id, telegram_cached_file_id)
+
         await sendVideoFromCache(chat_id, telegram_cached_file_id)
       }
     }
