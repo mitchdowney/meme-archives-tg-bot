@@ -201,7 +201,14 @@ export const getUserMention = (username = '', userId = '') => {
 
 export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: number) => {
   if (config.BOT_USER_NAME) {
-    const telegramVideoFile = await galleryGetTelegramVideoFile(config.BOT_USER_NAME, image_id)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let telegramVideoFile: any = null
+    try {
+      telegramVideoFile = await galleryGetTelegramVideoFile(config.BOT_USER_NAME, image_id)
+    } catch (error) {
+      console.error(error.response?.data || error.message)
+    }
+    
     if (telegramVideoFile) {
       await sendVideoFromCache(chat_id, telegramVideoFile.telegram_cached_file_id)
     } else {

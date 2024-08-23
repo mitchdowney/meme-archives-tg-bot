@@ -130,21 +130,29 @@ const startApp = async () => {
           const groupChatId = getChatId(req)
           const tagCommandsIndexMatchingTitle = getMatchingTagTitleFromTagCommandsIndex(groupChatId, commandText)
           if (tagCommandsIndexMatchingTitle) {
-            const image = await galleryGetRandomImage(tagCommandsIndexMatchingTitle)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            let image: any = null
+            try {
+              image = await galleryGetRandomImage(tagCommandsIndexMatchingTitle)
+            } catch (error) {
+              console.error(error)
+            }
 
-            const isVideo = image.has_video
-            const isAnimation = image.has_animation
-            
-            if (isVideo) {
-              await uploadAndSendVideoFromCache(groupChatId, image.id)
-            } else if (isAnimation) {
-              await uploadAndSendVideoFromCache(groupChatId, image.id)
-            } else if (!isVideo && !isAnimation) {
-              const imageUrl = getAvailableImageUrl('no-border', image)
-              if (imageUrl) {
-                await sendImage(groupChatId, imageUrl)
-              } else {
-                // await sendMessage(groupChatId, 'Image not found')
+            if (image) {
+              const isVideo = image.has_video
+              const isAnimation = image.has_animation
+              
+              if (isVideo) {
+                await uploadAndSendVideoFromCache(groupChatId, image.id)
+              } else if (isAnimation) {
+                await uploadAndSendVideoFromCache(groupChatId, image.id)
+              } else if (!isVideo && !isAnimation) {
+                const imageUrl = getAvailableImageUrl('no-border', image)
+                if (imageUrl) {
+                  await sendImage(groupChatId, imageUrl)
+                } else {
+                  // await sendMessage(groupChatId, 'Image not found')
+                }
               }
             }
           }
