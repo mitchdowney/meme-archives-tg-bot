@@ -251,17 +251,17 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
 const uploadVideoToCache = async (chat_id: string, videoPath: string): Promise<string> => {
   const formData = new FormData()
   formData.append('chat_id', chat_id)
-  formData.append('video', fs.createReadStream(videoPath))
+  formData.append('document', fs.createReadStream(videoPath))
   formData.append('disable_notification', 'true')
 
   try {
-    const response = await telegramAPIRequest('sendVideo', {
+    const response = await telegramAPIRequest('sendDocument', {
       data: formData,
       headers: {
         ...formData.getHeaders()
       }
     })
-    const fileId = response.data.result.video.file_id
+    const fileId = response.data.result.document.file_id
     console.log(`Video uploaded to cache successfully, file_id: ${fileId}`)
     return fileId
   } catch (error) {
