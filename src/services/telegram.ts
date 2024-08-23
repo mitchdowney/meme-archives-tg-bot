@@ -219,7 +219,7 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
         const videoPath = `/tmp/${image_id}-video.mp4`
         fs.writeFileSync(videoPath, videoBuffer)
         
-        const telegram_cached_file_id = await uploadVideoToCache(videoPath)
+        const telegram_cached_file_id = await uploadVideoToCache(chat_id, videoPath)
 
         await galleryCreateTelegramVideoFile(config.BOT_USER_NAME, image_id, telegram_cached_file_id)
 
@@ -230,7 +230,7 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
         const animationPath = `/tmp/${image_id}-animation.gif`
         fs.writeFileSync(animationPath, animationBuffer)
         
-        const telegram_cached_file_id = await uploadVideoToCache(animationPath)
+        const telegram_cached_file_id = await uploadVideoToCache(chat_id, animationPath)
 
         await galleryCreateTelegramVideoFile(config.BOT_USER_NAME, image_id, telegram_cached_file_id)
 
@@ -240,10 +240,9 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
   }
 }
 
-const uploadVideoToCache = async (videoPath: string): Promise<string> => {
+const uploadVideoToCache = async (chat_id: string, videoPath: string): Promise<string> => {
   const formData = new FormData()
-  const chatId = config.BOT_USER_NAME
-  formData.append('chat_id', chatId)
+  formData.append('chat_id', chat_id)
   formData.append('video', fs.createReadStream(videoPath))
   formData.append('disable_notification', 'true')
 
