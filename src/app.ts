@@ -17,7 +17,8 @@ import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage,
   galleryRemoveImageBackground, galleryUploadImage } from './services/galleryAPI'
 import { getChatId, getCommandText, getImageFile, getMentionedUserNames, getUserMention, getUserName,
   parseEditArtistCommand, parseEditImageCommand, parseUploadImageCommand, sendDocument, sendGalleryAdmin,
-  sendImage, sendMessage, setWebhook } from './services/telegram'
+  sendImage, sendMessage, setWebhook, 
+  uploadAndSendVideoFromCache} from './services/telegram'
 import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
 import { config } from './config'
 import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes,
@@ -128,11 +129,21 @@ const startApp = async () => {
           const tagCommandsIndexMatchingTitle = getMatchingTagTitleFromTagCommandsIndex(groupChatId, commandText)
           if (tagCommandsIndexMatchingTitle) {
             const image = await galleryGetRandomImage(tagCommandsIndexMatchingTitle)
-            const imageUrl = getAvailableImageUrl('no-border', image)
-            if (imageUrl) {
-              await sendImage(groupChatId, imageUrl)
-            } else {
-              // await sendMessage(groupChatId, 'Image not found')
+
+            const isVideo = image.has_video
+            const isAnimation = image.has_animation
+            
+            if (isVideo) {
+              await uploadAndSendVideoFromCache(groupChatId, image.id)
+            } else if (isAnimation) {
+              await uploadAndSendVideoFromCache(groupChatId, image.id)
+            } else if (!isVideo && !isAnimation) {
+              const imageUrl = getAvailableImageUrl('no-border', image)
+              if (imageUrl) {
+                await sendImage(groupChatId, imageUrl)
+              } else {
+                // await sendMessage(groupChatId, 'Image not found')
+              }
             }
           }
 
