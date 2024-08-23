@@ -264,7 +264,7 @@ const uploadVideoToCache = async (chat_id: string, videoPath: string): Promise<s
 const sendVideoFromCache = async (chat_id: string, file_id: string): Promise<void> => {
   const formData = new FormData()
   formData.append('chat_id', chat_id)
-  formData.append('video file_id', file_id)
+  formData.append('video', file_id)
 
   try {
     const response = await telegramAPIRequest('sendVideo', {
