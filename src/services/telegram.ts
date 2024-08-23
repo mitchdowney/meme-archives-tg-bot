@@ -10,7 +10,7 @@ import { Request } from 'express'
 
 import { config, telegramAPIBotFileUrl, telegramAPIBotUrl } from '../config'
 import { configText } from '../config/configurables'
-import { downloadImageAsBuffer, galleryCreateTelegramVideoFile, galleryGetImage, galleryGetTelegramVideoFile } from './galleryAPI'
+import { downloadImageAsBuffer, galleryCreateTelegramVideoFile, galleryGetImage, galleryGetTelegramVideoFile, galleryUpdateTelegramVideoFile } from './galleryAPI'
 
 const telegramAPIRequest = async (
   path: string,
@@ -202,13 +202,15 @@ export const getUserMention = (username = '', userId = '') => {
 export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: number) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let telegramVideoFile: any = null
+  let videoInCache = true
   try {
     telegramVideoFile = await galleryGetTelegramVideoFile(chat_id, image_id)
+    videoInCache = await checkVideoInCache(telegramVideoFile.telegram_cached_file_id)
   } catch (error) {
     console.error(error.response?.data || error.message)
   }
   
-  if (telegramVideoFile) {
+  if (telegramVideoFile && videoInCache) {
     await sendVideoFromCache(chat_id, telegramVideoFile.telegram_cached_file_id)
   } else {
     const image = await galleryGetImage(image_id.toString())
@@ -219,8 +221,12 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
       fs.writeFileSync(videoPath, videoBuffer)
       
       const telegram_cached_file_id = await uploadVideoToCache(chat_id, videoPath)
-
-      await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
+      
+      if (!videoInCache) {
+        await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
+      } else {
+        await galleryUpdateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
+      }
 
       await sendVideoFromCache(chat_id, telegram_cached_file_id)
     } else if (image.has_animation) {
@@ -231,7 +237,11 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
       
       const telegram_cached_file_id = await uploadVideoToCache(chat_id, animationPath)
 
-      await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
+      if (!videoInCache) {
+        await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
+      } else {
+        await galleryUpdateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
+      }
 
       await sendVideoFromCache(chat_id, telegram_cached_file_id)
     }
@@ -258,6 +268,26 @@ const uploadVideoToCache = async (chat_id: string, videoPath: string): Promise<s
     console.log('videoPath', videoPath)
     console.error('Failed to upload video to cache:', error.response?.data || error.message)
     throw error
+  }
+}
+
+export const checkVideoInCache = async (file_id: string): Promise<boolean> => {
+  try {
+    const response = await telegramAPIRequest('getFile', {
+      data: { file_id },
+      headers: { 'Content-Type': 'application/json' }
+    })
+
+    if (response.data.ok) {
+      console.log(`File exists in cache: ${file_id}`)
+      return true
+    } else {
+      console.log(`File does not exist in cache: ${file_id}`)
+      return false
+    }
+  } catch (error) {
+    console.error(`Error checking file in cache: ${file_id}`, error.response?.data || error.message)
+    return false
   }
 }
 

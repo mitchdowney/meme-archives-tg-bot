@@ -186,6 +186,18 @@ export const galleryCreateTelegramVideoFile = async (telegram_chat_id: string, i
   return response.data
 }
 
+export const galleryUpdateTelegramVideoFile = async (telegram_chat_id: string, image_id: number, telegram_cached_file_id: string) => {
+  const response = await galleryAPIAdminRequest('POST', '/telegram-video-file-update', {
+    data: {
+      telegram_chat_id,
+      image_id,
+      telegram_cached_file_id
+    }
+  })
+
+  return response.data
+}
+
 export const galleryGetArtist = async (artistId: string) => {
   const response = await galleryAPIRequest('GET', `/artist/${artistId}`)
   return response.data
