@@ -227,8 +227,6 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
       } else {
         await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
       }
-
-      await sendVideoFromCache(chat_id, telegram_cached_file_id)
     } else if (image.has_animation) {
       const animationUrl = `${config.GALLERY_IMAGE_BUCKET_ORIGIN}/${image_id}-animation.gif`
       const animationBuffer = await downloadImageAsBuffer(animationUrl)
@@ -242,8 +240,6 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
       } else {
         await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
       }
-
-      await sendVideoFromCache(chat_id, telegram_cached_file_id)
     }
   }
 }
@@ -251,17 +247,17 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
 const uploadVideoToCache = async (chat_id: string, videoPath: string): Promise<string> => {
   const formData = new FormData()
   formData.append('chat_id', chat_id)
-  formData.append('document', fs.createReadStream(videoPath))
+  formData.append('video', fs.createReadStream(videoPath))
   formData.append('disable_notification', 'true')
 
   try {
-    const response = await telegramAPIRequest('sendDocument', {
+    const response = await telegramAPIRequest('sendVideo', {
       data: formData,
       headers: {
         ...formData.getHeaders()
       }
     })
-    const fileId = response.data.result.document.file_id
+    const fileId = response.data.result.video.file_id
     console.log(`Video uploaded to cache successfully, file_id: ${fileId}`)
     return fileId
   } catch (error) {
