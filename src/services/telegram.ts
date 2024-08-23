@@ -242,7 +242,8 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
 
 const uploadVideoToCache = async (videoPath: string): Promise<string> => {
   const formData = new FormData()
-  formData.append('chat_id', config.BOT_USER_NAME)
+  const chatId = config.BOT_USER_NAME
+  formData.append('chat_id', chatId)
   formData.append('video', fs.createReadStream(videoPath))
   formData.append('disable_notification', 'true')
 
