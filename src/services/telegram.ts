@@ -213,51 +213,27 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
   } else {
     const image = await galleryGetImage(image_id.toString())
     if (image.has_video) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let telegramVideoFile: any = null
-      try {
-        telegramVideoFile = await galleryGetTelegramVideoFile(chat_id, image_id)
-      } catch (error) {
-        console.error(error.response?.data || error.message)
-      }
+      const videoUrl = `${config.GALLERY_IMAGE_BUCKET_ORIGIN}/${image_id}-video.mp4`
+      const videoBuffer = await downloadImageAsBuffer(videoUrl)
+      const videoPath = `/tmp/${image_id}-video.mp4`
+      fs.writeFileSync(videoPath, videoBuffer)
       
-      if (telegramVideoFile) {
-        await sendVideoFromCache(chat_id, telegramVideoFile.telegram_cached_file_id)
-      } else {
-        const videoUrl = `${config.GALLERY_IMAGE_BUCKET_ORIGIN}/${image_id}-video.mp4`
-        const videoBuffer = await downloadImageAsBuffer(videoUrl)
-        const videoPath = `/tmp/${image_id}-video.mp4`
-        fs.writeFileSync(videoPath, videoBuffer)
-        
-        const telegram_cached_file_id = await uploadVideoToCache(chat_id, videoPath)
-  
-        await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
-  
-        await sendVideoFromCache(chat_id, telegram_cached_file_id)
-      }
+      const telegram_cached_file_id = await uploadVideoToCache(chat_id, videoPath)
+
+      await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
+
+      await sendVideoFromCache(chat_id, telegram_cached_file_id)
     } else if (image.has_animation) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let telegramVideoFile: any = null
-      try {
-        telegramVideoFile = await galleryGetTelegramVideoFile(chat_id, image_id)
-      } catch (error) {
-        console.error(error.response?.data || error.message)
-      }
+      const animationUrl = `${config.GALLERY_IMAGE_BUCKET_ORIGIN}/${image_id}-animation.gif`
+      const animationBuffer = await downloadImageAsBuffer(animationUrl)
+      const animationPath = `/tmp/${image_id}-animation.gif`
+      fs.writeFileSync(animationPath, animationBuffer)
+      
+      const telegram_cached_file_id = await uploadVideoToCache(chat_id, animationPath)
 
-      if (telegramVideoFile) {
-        await sendVideoFromCache(chat_id, telegramVideoFile.telegram_cached_file_id)
-      } else {
-        const animationUrl = `${config.GALLERY_IMAGE_BUCKET_ORIGIN}/${image_id}-animation.gif`
-        const animationBuffer = await downloadImageAsBuffer(animationUrl)
-        const animationPath = `/tmp/${image_id}-animation.gif`
-        fs.writeFileSync(animationPath, animationBuffer)
-        
-        const telegram_cached_file_id = await uploadVideoToCache(chat_id, animationPath)
+      await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
 
-        await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
-
-        await sendVideoFromCache(chat_id, telegram_cached_file_id)
-      }
+      await sendVideoFromCache(chat_id, telegram_cached_file_id)
     }
   }
 }
