@@ -1,10 +1,16 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const fs = require('fs')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const FormData = require('form-data')
 
 import axios, { AxiosRequestConfig } from 'axios'
 import { Request } from 'express'
+
 import { config, telegramAPIBotFileUrl, telegramAPIBotUrl } from '../config'
 import { configText } from '../config/configurables'
+import { galleryCreateTelegramVideoFile, galleryGetImage, galleryGetTelegramVideoFile } from './galleryAPI'
 
 const telegramAPIRequest = async (
   path: string,
@@ -191,6 +197,80 @@ export const getUserMention = (username = '', userId = '') => {
   return username
     ? `@${username}`
     : `[${userId}](tg://user?id=${userId})`
+}
+
+export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: number) => {
+  if (config.BOT_USER_NAME) {
+    const telegramVideoFile = await galleryGetTelegramVideoFile(config.BOT_USER_NAME, image_id)
+    if (telegramVideoFile) {
+      await sendVideoFromCache(chat_id, telegramVideoFile.telegram_cached_file_id)
+    } else {
+      const image = await galleryGetImage(image_id.toString())
+      if (image.has_video) {
+        const videoUrl = `${config.GALLERY_IMAGE_BUCKET_ORIGIN}/${image_id}-video.mp4`
+        const videoPath = `/tmp/${image_id}-video.mp4`
+        const videoBuffer = await telegramAPIFileRequest(videoUrl, {
+          responseType: 'arraybuffer'
+        })
+        fs.writeFileSync(videoPath, videoBuffer.data)
+        const telegram_cached_file_id = await uploadVideoToCache(videoPath)
+        galleryCreateTelegramVideoFile(config.BOT_USER_NAME, image_id, telegram_cached_file_id)
+        await sendVideoFromCache(chat_id, telegram_cached_file_id)
+      } else if (image.has_animation) {
+        const animationUrl = `${config.GALLERY_IMAGE_BUCKET_ORIGIN}/${image_id}-animation.gif`
+        const animationPath = `/tmp/${image_id}-animation.gif`
+        const animationBuffer = await telegramAPIFileRequest(animationUrl, {
+          responseType: 'arraybuffer'
+        })
+        fs.writeFileSync(animationPath, animationBuffer.data)
+        const telegram_cached_file_id = await uploadVideoToCache(animationPath)
+        galleryCreateTelegramVideoFile(config.BOT_USER_NAME, image_id, telegram_cached_file_id)
+        await sendVideoFromCache(chat_id, telegram_cached_file_id)
+      }
+    }
+  }
+}
+
+const uploadVideoToCache = async (videoPath: string): Promise<string> => {
+  const formData = new FormData()
+  formData.append('chat_id', config.BOT_USER_NAME)
+  formData.append('video', fs.createReadStream(videoPath))
+  formData.append('disable_notification', 'true')
+
+  try {
+    const response = await telegramAPIRequest('sendVideo', {
+      data: formData,
+      headers: {
+        ...formData.getHeaders()
+      }
+    })
+    const fileId = response.data.result.video.file_id
+    console.log(`Video uploaded to cache successfully, file_id: ${fileId}`)
+    return fileId
+  } catch (error) {
+    console.log('videoPath', videoPath)
+    console.error('Failed to upload video to cache:', error.response?.data || error.message)
+    throw error
+  }
+}
+
+const sendVideoFromCache = async (chat_id: string, file_id: string): Promise<void> => {
+  const formData = new FormData()
+  formData.append('chat_id', chat_id)
+  formData.append('video file_id', file_id)
+
+  try {
+    const response = await telegramAPIRequest('sendVideo', {
+      data: formData,
+      headers: {
+        ...formData.getHeaders()
+      }
+    })
+    console.log(`Video sent successfully to chat ${chat_id}`, response.data)
+  } catch (error) {
+    console.log('video fileId', file_id)
+    console.error(`Failed to send video to chat ${chat_id}:`, error.response?.data || error.message)
+  }
 }
 
 type ImageFile = {

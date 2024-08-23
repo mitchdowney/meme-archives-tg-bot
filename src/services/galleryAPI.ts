@@ -169,6 +169,23 @@ export const galleryEditImage = async (id: number, data: GalleryUploadImage) => 
   return response.data
 }
 
+export const galleryGetTelegramVideoFile = async (bot_user_name: string, image_id: number) => {  
+  const response = await galleryAPIAdminRequest('GET', `/telegram-video-file/${bot_user_name}/${image_id}`)
+  return response.data
+}
+
+export const galleryCreateTelegramVideoFile = async (telegram_bot_user_name: string, image_id: number, telegram_cached_file_id: string) => {
+  const response = await galleryAPIAdminRequest('POST', '/telegram-video-file', {
+    data: {
+      telegram_bot_user_name,
+      image_id,
+      telegram_cached_file_id
+    }
+  })
+
+  return response.data
+}
+
 export const galleryGetArtist = async (artistId: string) => {
   const response = await galleryAPIRequest('GET', `/artist/${artistId}`)
   return response.data

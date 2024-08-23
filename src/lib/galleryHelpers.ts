@@ -22,8 +22,10 @@ export const getImageUrl = (id: number, imageVersion: ImageVersion) => {
   } else if (imageVersion === 'no-border') {
     const imageNameEnding = config.GALLERY_USE_DEPRECATED_NO_BORDER_IMAGE_NAME ? '-no-border' : ''
     return `${bucketOrigin}/${id}${imageNameEnding}.png`
-  } else if (imageVersion === 'preview' || imageVersion === 'video') {
+  } else if (imageVersion === 'preview') {
     return `${bucketOrigin}/${id}-preview.png`
+  } else if (imageVersion === 'video') {
+    return `${bucketOrigin}/${id}-video.mp4`
   } else {
     return `${bucketOrigin}/${id}-border.png`
   }
@@ -32,7 +34,7 @@ export const getImageUrl = (id: number, imageVersion: ImageVersion) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getAvailableImageVersion = (origVersion: ImageVersion | null, image: any) => {
   if (image.has_video) {
-    return 'preview'
+    return 'video'
   } else if (origVersion === 'animation' && image.has_animation) {
     return 'animation'
   } else if (origVersion === 'border' && image.has_border) {
@@ -48,7 +50,9 @@ const getAvailableImageVersion = (origVersion: ImageVersion | null, image: any) 
         ? 'no-border'
         : image.has_animation
           ? 'animation'
-          : 'border'
+          : image.has_video
+            ? 'video'
+            : 'border'
   }
 }
 
