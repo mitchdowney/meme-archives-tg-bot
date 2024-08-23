@@ -202,7 +202,7 @@ export const getUserMention = (username = '', userId = '') => {
 export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: number) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let telegramVideoFile: any = null
-  let videoInCache = true
+  let videoInCache = false
   try {
     telegramVideoFile = await galleryGetTelegramVideoFile(chat_id, image_id)
     videoInCache = await checkVideoInCache(telegramVideoFile.telegram_cached_file_id)
@@ -222,10 +222,10 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
       
       const telegram_cached_file_id = await uploadVideoToCache(chat_id, videoPath)
       
-      if (!videoInCache) {
-        await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
-      } else {
+      if (telegramVideoFile && !videoInCache) {
         await galleryUpdateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
+      } else {
+        await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
       }
 
       await sendVideoFromCache(chat_id, telegram_cached_file_id)
@@ -237,10 +237,10 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
       
       const telegram_cached_file_id = await uploadVideoToCache(chat_id, animationPath)
 
-      if (!videoInCache) {
-        await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
-      } else {
+      if (telegramVideoFile && !videoInCache) {
         await galleryUpdateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
+      } else {
+        await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
       }
 
       await sendVideoFromCache(chat_id, telegram_cached_file_id)
