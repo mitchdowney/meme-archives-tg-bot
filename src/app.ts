@@ -286,11 +286,23 @@ const webhookHandlers = {
     const chat_id = req?.body?.message?.chat?.id
     const title = commandText.split(' ')[1]
     const image = await galleryGetRandomImage(title)
-    const imageUrl = getAvailableImageUrl('no-border', image)
-    if (imageUrl) {
-      await sendImage(chat_id, imageUrl)
-    } else {
-      await sendMessage(chat_id, 'Image not found')
+
+    if (image) {
+      const isVideo = image.has_video
+      const isAnimation = image.has_animation
+      
+      if (isVideo) {
+        await uploadAndSendVideoFromCache(chat_id, image.id)
+      } else if (isAnimation) {
+        await uploadAndSendVideoFromCache(chat_id, image.id)
+      } else if (!isVideo && !isAnimation) {
+        const imageUrl = getAvailableImageUrl('no-border', image)
+        if (imageUrl) {
+          await sendImage(chat_id, imageUrl)
+        } else {
+          // await sendMessage(groupChatId, 'Image not found')
+        }
+      }
     }
   },
   getRandomImageMeta: async (req: Request) => {
