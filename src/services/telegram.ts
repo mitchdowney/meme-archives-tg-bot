@@ -499,3 +499,58 @@ export const getMentionedUserNames = (req) => {
 
   return mentionedUsers
 }
+
+export const deleteTelegramMessage = async (chat_id: string, message_id: number): Promise<void> => {
+  try {
+    const response = await telegramAPIRequest('deleteMessage', {
+      params: {
+        chat_id,
+        message_id
+      }
+    })
+
+    if (response.data.ok) {
+      console.log(`Message ${message_id} deleted successfully in chat ${chat_id}`)
+    } else {
+      console.error(`Failed to delete message ${message_id} in chat ${chat_id}:`, response.data)
+    }
+  } catch (error) {
+    console.error(`Error deleting message ${message_id} in chat ${chat_id}:`, error)
+  }
+}
+
+export const autoDeleteMatchingMessages = async (req: Request) => {
+  const chat_id = getChatId(req)
+  
+  if (checkIfForbiddenFileOrSticker(req)) {
+    await deleteTelegramMessage(chat_id, req.body.message.message_id)
+    return true
+  }
+
+  return false
+}
+
+const checkIfForbiddenFileOrSticker = (req: Request): boolean => {
+  const obj = req?.body
+
+  const targetFileIds = [
+    'CAACAgUAAyEFAASBoi84AALbeGb1VA7CZbmcSOureNnQS9PZSJ4NAAICDAACki2wVoTeyfm40ftHNgQ',
+    'CAACAgUAAx0CeyUr6ACEiNm_DWpfLQL1u4IQ9eSfWeEZ527zgACRw4AAjgr2VY3_KjomExfzTYE'
+  ]
+
+  const targetSetName = 'Daumen6'
+  const targetFileSizes = [2192685, 3346028]
+
+  const checkMessage = (req: Request): boolean => {
+    const message = req?.body?.message
+    const fileId = message?.sticker?.file_id || message?.video?.file_id
+    const setName = message?.sticker?.set_name
+    const fileSize = message?.sticker?.file_size || message?.video?.file_size
+    return targetFileIds.includes(fileId) || setName === targetSetName || targetFileSizes.includes(fileSize)
+  }
+
+  const mainMessage = obj?.message
+  const replyMessage = obj?.message?.reply_to_message
+
+  return checkMessage(mainMessage) || checkMessage(replyMessage)
+}

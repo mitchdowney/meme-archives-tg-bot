@@ -15,7 +15,7 @@ import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
 import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetImagesByArtist, galleryGetRandomImage,
   galleryRemoveImageBackground, galleryUploadImage } from './services/galleryAPI'
-import { getChatId, getCommandText, getImageFile, getMentionedUserNames, getUserMention, getUserName,
+import { autoDeleteMatchingMessages, getChatId, getCommandText, getImageFile, getMentionedUserNames, getUserMention, getUserName,
   parseEditArtistCommand, parseEditImageCommand, parseUploadImageCommand, sendDocument, sendGalleryAdmin,
   sendImage, sendMessage, setWebhook, 
   uploadAndSendVideoFromCache} from './services/telegram'
@@ -85,6 +85,11 @@ const startApp = async () => {
     checkIsAllowedChat,
     async function (req: Request, res: Response, next: NextFunction) {
       try {
+        const shouldAbort = await autoDeleteMatchingMessages(req)
+        if (shouldAbort) {
+          return
+        }
+
         const commandText = getCommandText(req)
         const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
         if (commandText) {
