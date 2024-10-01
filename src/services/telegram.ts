@@ -541,8 +541,7 @@ const checkIfForbiddenFileOrSticker = (req: Request): boolean => {
   const targetSetName = 'Daumen6'
   const targetFileSizes = [2192685, 3346028]
 
-  const checkMessage = (req: Request): boolean => {
-    const message = req?.body?.message
+  const checkMessage = (message: any): boolean => {
     const fileId = message?.sticker?.file_id || message?.video?.file_id
     const setName = message?.sticker?.set_name
     const fileSize = message?.sticker?.file_size || message?.video?.file_size
@@ -552,5 +551,5 @@ const checkIfForbiddenFileOrSticker = (req: Request): boolean => {
   const mainMessage = obj?.message
   const replyMessage = obj?.message?.reply_to_message
 
-  return checkMessage(mainMessage) || checkMessage(replyMessage)
+  return checkMessage(mainMessage) || (replyMessage && checkMessage(replyMessage))
 }
