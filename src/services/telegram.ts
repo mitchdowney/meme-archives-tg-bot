@@ -533,9 +533,13 @@ export const autoDeleteMatchingMessages = async (req: Request) => {
 const checkIfForbiddenFileOrSticker = (req: Request): boolean => {
   const obj = req?.body
 
-  const targetFileIds = [
+  const targetStickerAndVideoFileIds = [
     'CAACAgUAAyEFAASBoi84AALbeGb1VA7CZbmcSOureNnQS9PZSJ4NAAICDAACki2wVoTeyfm40ftHNgQ',
     'CAACAgUAAx0CeyUr6ACEiNm_DWpfLQL1u4IQ9eSfWeEZ527zgACRw4AAjgr2VY3_KjomExfzTYE'
+  ]
+
+  const targetPhotoFileIds = [
+    'AgACAgEAAx0CeyUr6AACEnFm_gba99aarvYnsw00GgN5kdR4rwAC1K0xGxnM8UejpJBpkDIVcgEAAwIAA3MAAzYE'
   ]
 
   const targetSetName = 'Daumen6'
@@ -545,7 +549,12 @@ const checkIfForbiddenFileOrSticker = (req: Request): boolean => {
     const fileId = message?.sticker?.file_id || message?.video?.file_id
     const setName = message?.sticker?.set_name
     const fileSize = message?.sticker?.file_size || message?.video?.file_size
-    return targetFileIds.includes(fileId) || setName === targetSetName || targetFileSizes.includes(fileSize)
+
+    // Check for photo file_ids
+    const photoFileIds = message?.photo?.map((photo: any) => photo.file_id) || []
+    const photoMatch = photoFileIds.some((id: string) => targetPhotoFileIds.includes(id))
+
+    return targetStickerAndVideoFileIds.includes(fileId) || setName === targetSetName || targetFileSizes.includes(fileSize) || photoMatch
   }
 
   const mainMessage = obj?.message
