@@ -87,7 +87,7 @@ const startApp = async () => {
       try {
         const groupChatId = getChatId(req)
         if (groupChatId === -1002066033640) {
-          console.log('req.body dev', req.body)
+          console.log('req.body dev', JSON.stringify(req.body))
         }
 
         const shouldAbort = await autoDeleteMatchingMessages(req)
