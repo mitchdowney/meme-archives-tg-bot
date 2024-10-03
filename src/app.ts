@@ -85,6 +85,11 @@ const startApp = async () => {
     checkIsAllowedChat,
     async function (req: Request, res: Response, next: NextFunction) {
       try {
+        const groupChatId = getChatId(req)
+        if (groupChatId === -1002066033640) {
+          console.log('req.body dev', req.body)
+        }
+
         const shouldAbort = await autoDeleteMatchingMessages(req)
         if (shouldAbort) {
           return
