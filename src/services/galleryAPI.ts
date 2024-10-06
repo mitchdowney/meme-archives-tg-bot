@@ -36,13 +36,14 @@ export const galleryGetImage = async (imageId: string) => {
   return response.data
 }
 
-export const galleryGetRandomImage = async (title?: string) => {
+export const galleryGetRandomImage = async (title?: string, memeOnly?: boolean) => {
   const response = await galleryAPIRequest(
     'GET', 
     '/image/get-one-random',
     {
       params: {
-        ...(title ? { title } : {})
+        ...(title ? { title } : {}),
+        ...(memeOnly ? { memeOnly } : {})
       }
     }
   )

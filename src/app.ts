@@ -113,7 +113,7 @@ const startApp = async () => {
             '/get_image': webhookHandlers.getImage,
             '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
             '/daumen': webhookHandlers.getRandomImage,
-            '/meme': webhookHandlers.getRandomImage,
+            '/meme': (req) => webhookHandlers.getRandomImage(req, true),
             '/my_id': webhookHandlers.myId,
             '/remove_image_background': webhookHandlers.removeImageBackground,
             '/random_image': webhookHandlers.getRandomImage,
@@ -291,11 +291,11 @@ const webhookHandlers = {
       await sendMessage(chat_id, text)
     }
   },
-  getRandomImage: async (req: Request) => {
+  getRandomImage: async (req: Request, memeOnly?: boolean) => {
     const commandText = getCommandText(req)
     const chat_id = req?.body?.message?.chat?.id
     const title = commandText.split(' ')[1]
-    const image = await galleryGetRandomImage(title)
+    const image = await galleryGetRandomImage(title, memeOnly)
 
     if (image) {
       const isVideo = image.has_video
