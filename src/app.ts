@@ -26,6 +26,7 @@ import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes,
 import { checkIfAllPlayersHaveDiscarded, dealFinalPokerHands, getDiscardPositions, pokerRedrawCardsForPlayer,
   sendPokerHand, sendPokerHandWinner, startPokerRound } from './services/games/poker'
 import { delay } from './lib/utility'
+import { listenForNFTPurchases } from './services/xrplHelpers'
 
 const port = 9000
 
@@ -35,6 +36,12 @@ const port = 9000
 initializeTagsCommandsIndexes()
 
 const startApp = async () => {
+
+  const deployerWalletAddress = 'rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC' // Account from raw data
+  // const nftMinterWalletAddress = 'rKqqb5QZXVAL3VqXJL6obfRGeHou1DtyBV' // Minter from raw data
+  const collectionTag = 'bafybeiahu6vp6dvcktap724jwobgexduudarr2mfzxvwlb7d4lxscfluwa' // Collection ID from URI
+
+  listenForNFTPurchases(deployerWalletAddress, collectionTag)
 
   const app = express()
   app.use(express.json({

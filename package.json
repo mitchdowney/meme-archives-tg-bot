@@ -45,6 +45,7 @@
     "pokersolver": "^2.1.4",
     "reflect-metadata": "^0.2.1",
     "sharp": "^0.33.4",
-    "typeorm": "^0.3.19"
+    "typeorm": "^0.3.19",
+    "xrpl": "^4.1.0"
   }
 }
