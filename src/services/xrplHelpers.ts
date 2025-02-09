@@ -133,11 +133,19 @@ async function fetchNFTMetadata(nftokenID, client) {
     const uriHex = response.result.uri
     const uri = hexToAscii(uriHex)
     const ipfsUrl = uri.replace('ipfs://', 'https://ipfs.io/ipfs/')
+    const pattern = /https:\/\/ipfs\.io\/ipfs\/(bafybeicrf3fsgca7fr3qgijsuyienw6tiz6ecpcllwdlel4xkrk7qjf5yi)\/(\d+\.json)/
 
-    logMessage(`Fetching NFT metadata from: ${ipfsUrl}`)
+    if (!pattern.test(ipfsUrl)) {
+      logMessage('URI does not match the expected pattern.')
+      return null
+    }
+
+    const cloudfrontUrl = ipfsUrl.replace('https://ipfs.io/ipfs/', 'https://dt36cccabucs2.cloudfront.net/')
+
+    logMessage(`Fetching NFT metadata from: ${cloudfrontUrl}`)
 
     try {
-      const metadataResponse = await axios.get(ipfsUrl, {
+      const metadataResponse = await axios.get(cloudfrontUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
         },
@@ -150,7 +158,7 @@ async function fetchNFTMetadata(nftokenID, client) {
         name: metadataResponse.data.name,
         description: metadataResponse.data.description,
         ipfsImage: metadataResponse.data.image,
-        ipfsImageUrl: metadataResponse.data.image.replace('ipfs://', 'https://ipfs.io/ipfs/'),
+        ipfsImageUrl: metadataResponse.data.image.replace('ipfs://', 'https://dt36cccabucs2.cloudfront.net/'),
         traits: metadataResponse.data.attributes,
         collectionId,
       }
@@ -159,7 +167,7 @@ async function fetchNFTMetadata(nftokenID, client) {
 
       return formattedMetadata
     } catch (error) {
-      logError('Error fetching NFT metadata from ipfs.io: ' + error)
+      logError('Error fetching NFT metadata from cloudfront.net: ' + error)
     }
   } else {
     logMessage('No URI found in NFT metadata.')
