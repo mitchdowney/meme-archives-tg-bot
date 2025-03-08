@@ -16,7 +16,7 @@ function logError(message) {
   console.error(`[${timestamp}] ${message}`)
 }
 
-export async function listenForNFTPurchases(account, collectionTag) {
+export async function listenForNFTPurchases(account, collectionTags) {
   const client = new xrpl.Client('wss://s1.ripple.com')
   let isConnecting = false // Track connection state
 
@@ -66,7 +66,7 @@ export async function listenForNFTPurchases(account, collectionTag) {
           const { guessedNFTokenID, guessedPurchaseAmount } = extractNFTInfo(meta)
           logMessage(`Guessed NFT ID: ${guessedNFTokenID}, Guessed Purchase Amount: ${guessedPurchaseAmount}`)
           if (guessedNFTokenID) {
-            const isFromCollection = await isNFTFromCollection(guessedNFTokenID, collectionTag, client)
+            const isFromCollection = await isNFTFromCollection(guessedNFTokenID, collectionTags, client)
             if (isFromCollection) {
               const priceInXRP = Math.floor(guessedPurchaseAmount / 1_000_000)
               const metadata = await fetchNFTMetadata(guessedNFTokenID, client)
@@ -175,8 +175,8 @@ async function fetchNFTMetadata(nftokenID, client) {
   }
 }
 
-async function isNFTFromCollection(nftokenID, collectionTag, client) {
-  logMessage(`Checking if NFT is from collection: ${collectionTag}`)
+async function isNFTFromCollection(nftokenID, collectionTags, client) {
+  logMessage(`Checking if NFT is from any of the collections: ${collectionTags.join(', ')}`)
   const metadata = await fetchNFTMetadata(nftokenID, client)
   if (!metadata) {
     logMessage('No metadata found for NFT.')
@@ -184,9 +184,14 @@ async function isNFTFromCollection(nftokenID, collectionTag, client) {
   }
 
   logMessage(`Checking NFT: Collection ID=${metadata.collectionId}`)
-  logMessage(`Expected: Collection ID=${collectionTag}`)
+  for (const collectionTag of collectionTags) {
+    logMessage(`Expected: Collection ID=${collectionTag}`)
+    if (metadata.collectionId === collectionTag) {
+      return true
+    }
+  }
 
-  return metadata.collectionId === collectionTag
+  return false
 }
 
 function extractNFTInfo(meta) {

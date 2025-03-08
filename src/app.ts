@@ -39,9 +39,13 @@ const startApp = async () => {
 
   const deployerWalletAddress = 'rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC' // Account from raw data
   // const nftMinterWalletAddress = 'rKqqb5QZXVAL3VqXJL6obfRGeHou1DtyBV' // Minter from raw data
-  const collectionTag = 'bafybeiahu6vp6dvcktap724jwobgexduudarr2mfzxvwlb7d4lxscfluwa' // Collection ID from URI
+  // Collection ID from URI
+  const collectionTags = [
+    'bafybeiahu6vp6dvcktap724jwobgexduudarr2mfzxvwlb7d4lxscfluwa', // 1000 set collectionId
+    'bafkreidtjf2ihiwtptiyadjfmesplo555iy2jdcwhfr6hkenr2z3fvxn2y' // 1/1s schema
+  ]
 
-  listenForNFTPurchases(deployerWalletAddress, collectionTag)
+  listenForNFTPurchases(deployerWalletAddress, collectionTags)
 
   const app = express()
   app.use(express.json({
