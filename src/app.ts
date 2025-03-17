@@ -26,6 +26,7 @@ import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes,
 import { checkIfAllPlayersHaveDiscarded, dealFinalPokerHands, getDiscardPositions, pokerRedrawCardsForPlayer,
   sendPokerHand, sendPokerHandWinner, startPokerRound } from './services/games/poker'
 import { delay } from './lib/utility'
+import { sendDiscordMessage } from './services/discord'
 
 const port = 9000
 
@@ -115,7 +116,8 @@ const startApp = async () => {
             '/ui': webhookHandlers.uploadImage,
             '/upload_image': webhookHandlers.uploadImage,
             '/poker_deal': webhookHandlers.pokerDeal,
-            '/poker_draw': webhookHandlers.pokerDraw
+            '/poker_draw': webhookHandlers.pokerDraw,
+            '/raid': webhookHandlers.discordForwardRaidMessage
           }
           
           for (const [command, handler] of Object.entries(commands)) {
@@ -494,6 +496,17 @@ const webhookHandlers = {
           await sendPokerHandWinner(pokerRound)
         }
       }
+    }
+  },
+  discordForwardRaidMessage: async (req: Request) => {
+    const commandText = getCommandText(req)
+    const raidCommandPattern = /^\/raid\s+(https:\/\/x\.com\/\S+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)$/
+    const match = commandText.match(raidCommandPattern)
+
+    if (match) {
+      const url = match[1]
+      const messageBody = `Telegram Raid 🚨 ${url}`
+      await sendDiscordMessage(messageBody)
     }
   }
 }
