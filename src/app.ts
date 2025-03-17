@@ -15,13 +15,13 @@ import { checkBotAppSecretKey } from './middleware/checkTelegramSecretKey'
 import { checkIsGroupAdmin } from './services/checkIsGroupAdmin'
 import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage, galleryGetImagesByArtist, galleryGetRandomImage,
   galleryRemoveImageBackground, galleryUploadImage } from './services/galleryAPI'
-import { autoDeleteMatchingMessages, getChatId, getCommandText, getImageFile, getMentionedUserNames, getUserMention, getUserName,
+import { /* autoDeleteMatchingMessages, */ getChatId, getCommandText, getImageFile, getMentionedUserNames, getUserMention, getUserName,
   parseEditArtistCommand, parseEditImageCommand, parseUploadImageCommand, sendDocument, sendGalleryAdmin,
   sendImage, sendMessage, setWebhook, 
-  uploadAndSendVideoFromCache} from './services/telegram'
+  /* uploadAndSendVideoFromCache */ } from './services/telegram'
 import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
 import { config } from './config'
-import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes,
+import { /* getMatchingTagTitleFromTagCommandsIndex, */ initializeTagsCommandsIndexes,
   updateTagCommandsIndex } from './services/memesIndex'
 import { checkIfAllPlayersHaveDiscarded, dealFinalPokerHands, getDiscardPositions, pokerRedrawCardsForPlayer,
   sendPokerHand, sendPokerHandWinner, startPokerRound } from './services/games/poker'
@@ -86,37 +86,37 @@ const startApp = async () => {
     checkIsAllowedChat,
     async function (req: Request, res: Response, next: NextFunction) {
       try {
-        const shouldAbort = await autoDeleteMatchingMessages(req)
-        if (shouldAbort) {
-          return
-        }
+        // const shouldAbort = await autoDeleteMatchingMessages(req)
+        // if (shouldAbort) {
+        //   return
+        // }
 
         const commandText = getCommandText(req)
-        const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
+        // const callbackDataObject = req.body.callback_query?.data ? JSON.parse(req.body.callback_query.data) : null
         if (commandText) {
           const commands = {
-            '/ea': webhookHandlers.editArtist,
-            '/edit_artist': webhookHandlers.editArtist,
-            '/edit_image': webhookHandlers.editImage,
-            '/ei': webhookHandlers.editImage,
-            '/feature_artist': webhookHandlers.featureArtist,
-            '/gallery_admin': webhookHandlers.galleryAdmin,
-            '/gallery_hello': webhookHandlers.galleryHello,
-            '/gallery_standards': webhookHandlers.galleryStandards,
-            '/get_image_file': webhookHandlers.getImageFile,
-            '/get_image_meta': webhookHandlers.getImageMeta,
-            '/get_image': webhookHandlers.getImage,
-            '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
-            '/meme': webhookHandlers.getRandomImage,
-            '/my_id': webhookHandlers.myId,
-            '/remove_image_background': webhookHandlers.removeImageBackground,
-            '/random_image': webhookHandlers.getRandomImage,
-            '/random': webhookHandlers.getRandomImage,
-            '/refresh_tags': webhookHandlers.refreshTags,
-            '/ui': webhookHandlers.uploadImage,
-            '/upload_image': webhookHandlers.uploadImage,
-            '/poker_deal': webhookHandlers.pokerDeal,
-            '/poker_draw': webhookHandlers.pokerDraw,
+            // '/ea': webhookHandlers.editArtist,
+            // '/edit_artist': webhookHandlers.editArtist,
+            // '/edit_image': webhookHandlers.editImage,
+            // '/ei': webhookHandlers.editImage,
+            // '/feature_artist': webhookHandlers.featureArtist,
+            // '/gallery_admin': webhookHandlers.galleryAdmin,
+            // '/gallery_hello': webhookHandlers.galleryHello,
+            // '/gallery_standards': webhookHandlers.galleryStandards,
+            // '/get_image_file': webhookHandlers.getImageFile,
+            // '/get_image_meta': webhookHandlers.getImageMeta,
+            // '/get_image': webhookHandlers.getImage,
+            // '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
+            // '/meme': webhookHandlers.getRandomImage,
+            // '/my_id': webhookHandlers.myId,
+            // '/remove_image_background': webhookHandlers.removeImageBackground,
+            // '/random_image': webhookHandlers.getRandomImage,
+            // '/random': webhookHandlers.getRandomImage,
+            // '/refresh_tags': webhookHandlers.refreshTags,
+            // '/ui': webhookHandlers.uploadImage,
+            // '/upload_image': webhookHandlers.uploadImage,
+            // '/poker_deal': webhookHandlers.pokerDeal,
+            // '/poker_draw': webhookHandlers.pokerDraw,
             '/raid': webhookHandlers.discordForwardRaidMessage
           }
           
@@ -128,53 +128,53 @@ const startApp = async () => {
             }
           }
 
-          /*
-            If none of those test true, then check if the command has a matching tag title in the gallery.
-            If it does, return a random meme for that tag.
-          */
-          const groupChatId = getChatId(req)
-          const tagCommandsIndexMatchingTitle = getMatchingTagTitleFromTagCommandsIndex(groupChatId, commandText)
-          if (tagCommandsIndexMatchingTitle) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            let image: any = null
-            try {
-              image = await galleryGetRandomImage(tagCommandsIndexMatchingTitle)
-            } catch (error) {
-              console.error(error)
-            }
+          // /*
+          //   If none of those test true, then check if the command has a matching tag title in the gallery.
+          //   If it does, return a random meme for that tag.
+          // */
+          // const groupChatId = getChatId(req)
+          // const tagCommandsIndexMatchingTitle = getMatchingTagTitleFromTagCommandsIndex(groupChatId, commandText)
+          // if (tagCommandsIndexMatchingTitle) {
+          //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          //   let image: any = null
+          //   try {
+          //     image = await galleryGetRandomImage(tagCommandsIndexMatchingTitle)
+          //   } catch (error) {
+          //     console.error(error)
+          //   }
 
-            if (image) {
-              const isVideo = image.has_video
-              const isAnimation = image.has_animation
+          //   if (image) {
+          //     const isVideo = image.has_video
+          //     const isAnimation = image.has_animation
               
-              if (isVideo) {
-                await uploadAndSendVideoFromCache(groupChatId, image.id)
-              } else if (isAnimation) {
-                await uploadAndSendVideoFromCache(groupChatId, image.id)
-              } else if (!isVideo && !isAnimation) {
-                const imageUrl = getAvailableImageUrl('no-border', image)
-                if (imageUrl) {
-                  await sendImage(groupChatId, imageUrl)
-                } else {
-                  // await sendMessage(groupChatId, 'Image not found')
-                }
-              }
-            }
-          }
+          //     if (isVideo) {
+          //       await uploadAndSendVideoFromCache(groupChatId, image.id)
+          //     } else if (isAnimation) {
+          //       await uploadAndSendVideoFromCache(groupChatId, image.id)
+          //     } else if (!isVideo && !isAnimation) {
+          //       const imageUrl = getAvailableImageUrl('no-border', image)
+          //       if (imageUrl) {
+          //         await sendImage(groupChatId, imageUrl)
+          //       } else {
+          //         // await sendMessage(groupChatId, 'Image not found')
+          //       }
+          //     }
+          //   }
+          // }
 
-        } else if (callbackDataObject?.callback_data) {
-          const callbackDataHandlers = {
-            'edit_artist_prompt': webhookHandlers.editArtistPrompt,          
-            'edit_image_prompt': webhookHandlers.editImagePrompt,
-            'get_image_prompt': webhookHandlers.getImagePrompt,
-            'upload_image_prompt': webhookHandlers.uploadImagePrompt
-          }
+        } // else if (callbackDataObject?.callback_data) {
+        //   const callbackDataHandlers = {
+        //     'edit_artist_prompt': webhookHandlers.editArtistPrompt,          
+        //     'edit_image_prompt': webhookHandlers.editImagePrompt,
+        //     'get_image_prompt': webhookHandlers.getImagePrompt,
+        //     'upload_image_prompt': webhookHandlers.uploadImagePrompt
+        //   }
         
-          const handler = callbackDataHandlers[callbackDataObject.callback_data]
-          if (handler) {
-            await handler(req)
-          }
-        }
+        //   const handler = callbackDataHandlers[callbackDataObject.callback_data]
+        //   if (handler) {
+        //     await handler(req)
+        //   }
+        // }
       } catch (error) {
         next(error)
       }
@@ -182,16 +182,16 @@ const startApp = async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.error(error)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   console.error(error)
+    // }
 
-    const chat_id = getChatId(req)
-    const errorMessage = error?.response?.data?.message || error?.message
+    // const chat_id = getChatId(req)
+    // const errorMessage = error?.response?.data?.message || error?.message
 
-    if (chat_id && errorMessage) {
-      sendMessage(chat_id, errorMessage)
-    }
+    // if (chat_id && errorMessage) {
+    //   sendMessage(chat_id, errorMessage)
+    // }
   })
 
   app.listen(port)
