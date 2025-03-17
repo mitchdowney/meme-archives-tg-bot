@@ -21,7 +21,7 @@ import { /* autoDeleteMatchingMessages, */ getChatId, getCommandText, getImageFi
   /* uploadAndSendVideoFromCache */ } from './services/telegram'
 import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
 import { config } from './config'
-import { /* getMatchingTagTitleFromTagCommandsIndex, */ initializeTagsCommandsIndexes,
+import { /* getMatchingTagTitleFromTagCommandsIndex,  initializeTagsCommandsIndexes,*/
   updateTagCommandsIndex } from './services/memesIndex'
 import { checkIfAllPlayersHaveDiscarded, dealFinalPokerHands, getDiscardPositions, pokerRedrawCardsForPlayer,
   sendPokerHand, sendPokerHandWinner, startPokerRound } from './services/games/poker'
@@ -33,7 +33,7 @@ const port = 9000
 /*
   On startup, initialize the tagCommandsIndex for each group chat.
 */
-initializeTagsCommandsIndexes()
+// initializeTagsCommandsIndexes()
 
 const startApp = async () => {
 
@@ -499,6 +499,7 @@ const webhookHandlers = {
     }
   },
   discordForwardRaidMessage: async (req: Request) => {
+    await checkIsGroupAdmin(req)
     const commandText = getCommandText(req)
     const raidCommandPattern = /^\/raid\s+(https:\/\/x\.com\/\S+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)$/
     const match = commandText.match(raidCommandPattern)
