@@ -42,10 +42,10 @@ const startApp = async () => {
   // const nftMinterWalletAddress = 'rKqqb5QZXVAL3VqXJL6obfRGeHou1DtyBV' // Minter from raw data
   
   const issuerAddresses = [
-    '000800002E65A654EE811F9948D3EF4F273135BC', // Riptards 1000
-    '0008000087A44BF2DB8E94E6FC3CCBB3ABA11748', // Riptards 1/1s
-    '000813887312199D24CAB41A7335FFAEAD70640C', // Riptards Whoami
-    '00080000F8D52353DFBEA4DBA562A0BCE2CA1B87', // Test Collection
+    '2E65A654EE811F9948D3EF4F273135BCEF6AB558', // Riptards 1000
+    '87A44BF2DB8E94E6FC3CCBB3ABA11748352487EB', // Riptards 1/1s
+    '7312199D24CAB41A7335FFAEAD70640C928537D0', // Riptards Whoami
+    'F8D52353DFBEA4DBA562A0BCE2CA1B8746A3F145', // Test Collection
   ]
 
   listenForNFTPurchases(deployerWalletAddress, issuerAddresses)

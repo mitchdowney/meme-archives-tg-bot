@@ -173,7 +173,7 @@ async function fetchNFTMetadata(nftokenID, client) {
 
 async function isNFTFromIssuer(nftTokenID, issuerAddresses) {
   logMessage(`Checking if NFT is from any of the issuers: ${issuerAddresses.join(', ')}`)
-  const issuerAddressToCheck = nftTokenID.substring(0, 40)
+  const issuerAddressToCheck = nftTokenID.substring(8, 48)
 
   logMessage(`Checking NFT: Issuer Address=${issuerAddressToCheck}`)
   for (const issuerAddress of issuerAddresses) {
