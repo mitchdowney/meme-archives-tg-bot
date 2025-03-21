@@ -145,9 +145,9 @@ async function fetchNFTMetadata(nftokenID, client) {
       })
 
       const ipfsImageUrl = metadataResponse.data.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
-      await galleryUploadIPFSImageToCache(ipfsImageUrl)
+      const data = await galleryUploadIPFSImageToCache(ipfsImageUrl)
 
-      const cacheImageUrl = metadataResponse.data.image.replace('ipfs://', 'https://dt36cccabucs2.cloudfront.net/')
+      const cacheImageUrl = data?.cacheImageUrl
 
       const formattedMetadata = {
         name: metadataResponse.data.name,
@@ -161,7 +161,7 @@ async function fetchNFTMetadata(nftokenID, client) {
 
       return formattedMetadata
     } catch (error) {
-      logError('Error fetching NFT metadata from cloudfront.net: ' + error)
+      logError('Error fetching NFT metadata: ' + error)
     }
   } else {
     logMessage('No URI found in NFT metadata.')
