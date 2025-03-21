@@ -16,7 +16,7 @@ function logError(message) {
   console.error(`[${timestamp}] ${message}`)
 }
 
-export async function listenForNFTPurchases(account, collectionTags) {
+export async function listenForNFTPurchases(account, issuerAddresses) {
   const client = new xrpl.Client('wss://s1.ripple.com')
   let isConnecting = false // Track connection state
 
@@ -66,8 +66,8 @@ export async function listenForNFTPurchases(account, collectionTags) {
           const { guessedNFTokenID, guessedPurchaseAmount } = extractNFTInfo(meta)
           logMessage(`Guessed NFT ID: ${guessedNFTokenID}, Guessed Purchase Amount: ${guessedPurchaseAmount}`)
           if (guessedNFTokenID) {
-            const isFromCollection = await isNFTFromCollection(guessedNFTokenID, collectionTags, client)
-            if (isFromCollection) {
+            const isFromIssuer = await isNFTFromIssuer(guessedNFTokenID, issuerAddresses)
+            if (isFromIssuer) {
               const priceInXRP = Math.floor(guessedPurchaseAmount / 1_000_000)
               const metadata = await fetchNFTMetadata(guessedNFTokenID, client)
               if (metadata) {
@@ -151,16 +151,12 @@ async function fetchNFTMetadata(nftokenID, client) {
         },
       })
 
-      const imageUri = metadataResponse.data.image
-      const collectionId = imageUri.split('/')[2]
-
       const formattedMetadata = {
         name: metadataResponse.data.name,
         description: metadataResponse.data.description,
         ipfsImage: metadataResponse.data.image,
         ipfsImageUrl: metadataResponse.data.image.replace('ipfs://', 'https://dt36cccabucs2.cloudfront.net/'),
-        traits: metadataResponse.data.attributes,
-        collectionId,
+        traits: metadataResponse.data.attributes
       }
 
       logMessage('formattedMetadata: \n' + JSON.stringify(formattedMetadata))
@@ -175,18 +171,14 @@ async function fetchNFTMetadata(nftokenID, client) {
   }
 }
 
-async function isNFTFromCollection(nftokenID, collectionTags, client) {
-  logMessage(`Checking if NFT is from any of the collections: ${collectionTags.join(', ')}`)
-  const metadata = await fetchNFTMetadata(nftokenID, client)
-  if (!metadata) {
-    logMessage('No metadata found for NFT.')
-    return false
-  }
+async function isNFTFromIssuer(nftTokenID, issuerAddresses) {
+  logMessage(`Checking if NFT is from any of the issuers: ${issuerAddresses.join(', ')}`)
+  const issuerAddressToCheck = nftTokenID.substring(0, 40)
 
-  logMessage(`Checking NFT: Collection ID=${metadata.collectionId}`)
-  for (const collectionTag of collectionTags) {
-    logMessage(`Expected: Collection ID=${collectionTag}`)
-    if (metadata.collectionId === collectionTag) {
+  logMessage(`Checking NFT: Issuer Address=${issuerAddressToCheck}`)
+  for (const issuerAddress of issuerAddresses) {
+    logMessage(`Expected: Issuer Address=${issuerAddress}`)
+    if (issuerAddressToCheck === issuerAddress) {
       return true
     }
   }

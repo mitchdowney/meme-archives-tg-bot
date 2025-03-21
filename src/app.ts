@@ -38,15 +38,17 @@ initializeTagsCommandsIndexes()
 
 const startApp = async () => {
 
-  const deployerWalletAddress = 'rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC' // Account from raw data
+  const deployerWalletAddress = 'rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC' // Account from raw data, this corresponds with the xrp.cafe wallet
   // const nftMinterWalletAddress = 'rKqqb5QZXVAL3VqXJL6obfRGeHou1DtyBV' // Minter from raw data
-  // Collection ID from URI
-  const collectionTags = [
-    'bafybeiahu6vp6dvcktap724jwobgexduudarr2mfzxvwlb7d4lxscfluwa', // 1000 set collectionId
-    'bafkreidtjf2ihiwtptiyadjfmesplo555iy2jdcwhfr6hkenr2z3fvxn2y' // 1/1s schema
+  
+  const issuerAddresses = [
+    '000800002E65A654EE811F9948D3EF4F273135BC', // Riptards 1000
+    '0008000087A44BF2DB8E94E6FC3CCBB3ABA11748', // Riptards 1/1s
+    '000813887312199D24CAB41A7335FFAEAD70640C', // Riptards Whoami
+    '00080000F8D52353DFBEA4DBA562A0BCE2CA1B87', // Test Collection
   ]
 
-  listenForNFTPurchases(deployerWalletAddress, collectionTags)
+  listenForNFTPurchases(deployerWalletAddress, issuerAddresses)
 
   const app = express()
   app.use(express.json({
@@ -129,7 +131,7 @@ const startApp = async () => {
             '/upload_image': webhookHandlers.uploadImage,
             '/poker_deal': webhookHandlers.pokerDeal,
             '/poker_draw': webhookHandlers.pokerDraw,
-            '/raid': webhookHandlers.discordForwardRaidMessage
+            // '/raid': webhookHandlers.discordForwardRaidMessage
           }
           
           for (const [command, handler] of Object.entries(commands)) {
