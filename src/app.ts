@@ -27,6 +27,7 @@ import { checkIfAllPlayersHaveDiscarded, dealFinalPokerHands, getDiscardPosition
   sendPokerHand, sendPokerHandWinner, startPokerRound } from './services/games/poker'
 import { delay } from './lib/utility'
 import { sendDiscordMessage } from './services/discord'
+import { listenForNFTPurchases } from './services/xrplHelpers'
 
 const port = 9000
 
@@ -36,6 +37,16 @@ const port = 9000
 initializeTagsCommandsIndexes()
 
 const startApp = async () => {
+
+  const deployerWalletAddress = 'rpx9JThQ2y37FaGeeJP7PXDUVEXY3PHZSC' // Account from raw data
+  // const nftMinterWalletAddress = 'rKqqb5QZXVAL3VqXJL6obfRGeHou1DtyBV' // Minter from raw data
+  // Collection ID from URI
+  const collectionTags = [
+    'bafybeiahu6vp6dvcktap724jwobgexduudarr2mfzxvwlb7d4lxscfluwa', // 1000 set collectionId
+    'bafkreidtjf2ihiwtptiyadjfmesplo555iy2jdcwhfr6hkenr2z3fvxn2y' // 1/1s schema
+  ]
+
+  listenForNFTPurchases(deployerWalletAddress, collectionTags)
 
   const app = express()
   app.use(express.json({
@@ -108,6 +119,7 @@ const startApp = async () => {
             '/get_image': webhookHandlers.getImage,
             '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
             '/meme': webhookHandlers.getRandomImage,
+            '/riptard': webhookHandlers.getRandomImage,
             '/my_id': webhookHandlers.myId,
             '/remove_image_background': webhookHandlers.removeImageBackground,
             '/random_image': webhookHandlers.getRandomImage,
