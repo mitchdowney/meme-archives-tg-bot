@@ -283,3 +283,15 @@ export const downloadImageAsBuffer = async (imageUrl: string): Promise<Buffer> =
     throw new Error(`Failed to download image: ${error.message}`)
   }
 }
+
+export const galleryUploadIPFSImageToCache = async (ipfsImageUrl: string) => {
+  try {
+    await galleryAPIAdminRequest('POST', '/image/upload-ipfs-image-to-cache', {
+      data: {
+        ipfsImageUrl
+      }
+    })
+  } catch (error) {
+    throw new Error(`Failed to upload IPFS image to cache: ${error.message}`)
+  }
+}

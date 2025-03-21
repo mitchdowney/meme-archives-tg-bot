@@ -1,4 +1,5 @@
 import { config } from '../config'
+import { galleryUploadIPFSImageToCache } from './galleryAPI'
 import { sendImage } from './telegram'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -132,30 +133,27 @@ async function fetchNFTMetadata(nftokenID, client) {
   if (response.result && response.result.uri) {
     const uriHex = response.result.uri
     const uri = hexToAscii(uriHex)
-    const ipfsUrl = uri.replace('ipfs://', 'https://ipfs.io/ipfs/')
-    const pattern = /https:\/\/ipfs\.io\/ipfs\/(bafybeicrf3fsgca7fr3qgijsuyienw6tiz6ecpcllwdlel4xkrk7qjf5yi)\/(\d+\.json)/
+    const metadataUrl = uri.replace('ipfs://', 'https://ipfs.xrp.cafe/ipfs/')
 
-    if (!pattern.test(ipfsUrl)) {
-      logMessage('URI does not match the expected pattern.')
-      return null
-    }
-
-    const cloudfrontUrl = ipfsUrl.replace('https://ipfs.io/ipfs/', 'https://dt36cccabucs2.cloudfront.net/')
-
-    logMessage(`Fetching NFT metadata from: ${cloudfrontUrl}`)
+    logMessage(`Fetching NFT metadata from: ${metadataUrl}`)
 
     try {
-      const metadataResponse = await axios.get(cloudfrontUrl, {
+      const metadataResponse = await axios.get(metadataUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
         },
       })
 
+      const ipfsImageUrl = metadataResponse.data.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
+      await galleryUploadIPFSImageToCache(ipfsImageUrl)
+
+      const cacheImageUrl = metadataResponse.data.image.replace('ipfs://', 'https://dt36cccabucs2.cloudfront.net/')
+
       const formattedMetadata = {
         name: metadataResponse.data.name,
         description: metadataResponse.data.description,
         ipfsImage: metadataResponse.data.image,
-        ipfsImageUrl: metadataResponse.data.image.replace('ipfs://', 'https://dt36cccabucs2.cloudfront.net/'),
+        cacheImageUrl,
         traits: metadataResponse.data.attributes
       }
 
@@ -204,7 +202,7 @@ function notifyTelegram(metadata, priceInXRP, guessedNFTokenID) {
   const text = `**RIPTARD SOLD 🔥\n${metadata.name} 🤡\n${priceInXRP} XRP 💰**\n[NFT on XRP Cafe 🔗](${xrpCafeUrl})`
 
   chat_ids.forEach(chat_id => {
-    sendImage(`${chat_id}`, `${metadata.ipfsImageUrl}?0`, true, text, false, { parse_mode: 'Markdown' })
+    sendImage(`${chat_id}`, `${metadata.cacheImageUrl}?0`, true, text, false, { parse_mode: 'Markdown' })
   })
 }
 
