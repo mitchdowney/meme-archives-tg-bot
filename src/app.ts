@@ -107,11 +107,11 @@ const startApp = async () => {
             '/get_image_meta': webhookHandlers.getImageMeta,
             '/get_image': webhookHandlers.getImage,
             '/get_random_image_meta': webhookHandlers.getRandomImageMeta,
-            '/meme': webhookHandlers.getRandomImage,
+            '/meme': (req) => webhookHandlers.getRandomImage(req, true),
             '/my_id': webhookHandlers.myId,
             '/remove_image_background': webhookHandlers.removeImageBackground,
-            '/random_image': webhookHandlers.getRandomImage,
-            '/random': webhookHandlers.getRandomImage,
+            '/random_image': (req) => webhookHandlers.getRandomImage(req, false),
+            '/random': (req) => webhookHandlers.getRandomImage(req, true),
             '/refresh_tags': webhookHandlers.refreshTags,
             '/ui': webhookHandlers.uploadImage,
             '/upload_image': webhookHandlers.uploadImage,
@@ -278,16 +278,28 @@ const webhookHandlers = {
       await sendMessage(chat_id, text)
     }
   },
-  getRandomImage: async (req: Request) => {
+  getRandomImage: async (req: Request, memeOnly?: boolean) => {
     const commandText = getCommandText(req)
     const chat_id = req?.body?.message?.chat?.id
     const title = commandText.split(' ')[1]
-    const image = await galleryGetRandomImage(title)
-    const imageUrl = getAvailableImageUrl('no-border', image)
-    if (imageUrl) {
-      await sendImage(chat_id, imageUrl)
-    } else {
-      await sendMessage(chat_id, 'Image not found')
+    const image = await galleryGetRandomImage(title, memeOnly)
+
+    if (image) {
+      const isVideo = image.has_video
+      const isAnimation = image.has_animation
+      
+      if (isVideo) {
+        await uploadAndSendVideoFromCache(chat_id, image.id)
+      } else if (isAnimation) {
+        await uploadAndSendVideoFromCache(chat_id, image.id)
+      } else if (!isVideo && !isAnimation) {
+        const imageUrl = getAvailableImageUrl('no-border', image)
+        if (imageUrl) {
+          await sendImage(chat_id, imageUrl)
+        } else {
+          // await sendMessage(groupChatId, 'Image not found')
+        }
+      }
     }
   },
   getRandomImageMeta: async (req: Request) => {
