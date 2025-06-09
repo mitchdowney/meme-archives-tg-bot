@@ -18,6 +18,7 @@ import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage,
 import { autoDeleteMatchingMessages, getChatId, getCommandText, getImageFile, getMentionedUserNames, getUserMention, getUserName,
   parseEditArtistCommand, parseEditImageCommand, parseUploadImageCommand, sendDocument, sendGalleryAdmin,
   sendImage, sendMessage, setWebhook, 
+  uploadAndSendAnimationFromCache, 
   uploadAndSendVideoFromCache} from './services/telegram'
 import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
 import { config } from './config'
@@ -150,7 +151,7 @@ const startApp = async () => {
               if (isVideo) {
                 await uploadAndSendVideoFromCache(groupChatId, image.id)
               } else if (isAnimation) {
-                await uploadAndSendVideoFromCache(groupChatId, image.id)
+                await uploadAndSendAnimationFromCache(groupChatId, image.id)
               } else if (!isVideo && !isAnimation) {
                 const imageUrl = getAvailableImageUrl('no-border', image)
                 if (imageUrl) {
