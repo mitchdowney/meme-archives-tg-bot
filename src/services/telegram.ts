@@ -88,7 +88,7 @@ export const sendMessage = async (chat_id: string, text: string, options?: SendM
 
 export const sendImage = async (chat_id: string, imageUrl: string, shouldCheckAndRetry?: boolean,
   text?: string, has_spoiler = false, options?: SendMessageOptions) => {
-  imageUrl = `${imageUrl}?cacheBust=3`
+  imageUrl = `${imageUrl}?cacheBust=4`
   if (shouldCheckAndRetry) {
     for (let i = 0; i < 5; i++) {
       try {
