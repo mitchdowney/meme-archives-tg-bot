@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import { getChatAdministrators } from './telegram'
 import createHttpError = require('http-errors')
+import { checkIsAllowedUser } from '../middleware/checkIsAllowedUser'
 
 export const checkIsGroupAdmin = (req: Request) => {
   // eslint-disable-next-line no-async-promise-executor
@@ -17,8 +18,9 @@ export const checkIsGroupAdmin = (req: Request) => {
 
       const admins = chatAdminsData.result
       const isAdmin = admins.some(admin => admin.user.id === userId)
+      const isAllowedUser = checkIsAllowedUser(req)
 
-      if (isAdmin) {
+      if (isAdmin && isAllowedUser) {
         resolve()
       } else {
         const errorMessage = 'You must be an admin to use this command.'

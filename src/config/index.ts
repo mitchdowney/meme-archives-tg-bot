@@ -8,10 +8,8 @@ export const config = {
     ?.split(',')
     .map(Number)
     .filter(Number.isInteger),
-  BOT_APP_ALLOWED_USER_IDS: process.env.BOT_APP_ALLOWED_USER_IDS
-    ?.split(',')
-    .map(Number)
-    .filter(Number.isInteger),
+  BOT_APP_ALLOWED_USERNAMES: process.env.BOT_APP_ALLOWED_USERNAMES
+    ?.split(','),
   GALLERY_WEB_ORIGIN: process.env.GALLERY_WEB_ORIGIN,
   GALLERY_API_ORIGIN: process.env.GALLERY_API_ORIGIN,
   GALLERY_API_SECRET_KEY: process.env.GALLERY_API_SECRET_KEY,
