@@ -18,6 +18,9 @@ export const config = {
   GALLERY_IMAGE_PREVIEW_CROP_POSITION: process.env.GALLERY_IMAGE_PREVIEW_CROP_POSITION,
   GALLERY_USE_DEPRECATED_NO_BORDER_IMAGE_NAME: process.env.GALLERY_USE_DEPRECATED_NO_BORDER_IMAGE_NAME?.toLowerCase() === 'true',
   DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL,
+  OWNER_FIRST_NAME: process.env.OWNER_FIRST_NAME,
+  OWNER_LAST_NAME: process.env.OWNER_LAST_NAME,
+  OWNER_ID: process.env.OWNER_ID ? Number(process.env.OWNER_ID) : undefined,
 }
 
 export const telegramAPIBotUrl = `https://api.telegram.org/bot${config.BOT_TOKEN}`
