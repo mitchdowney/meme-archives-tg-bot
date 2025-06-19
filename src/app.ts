@@ -28,7 +28,7 @@ import { checkIfAllPlayersHaveDiscarded, dealFinalPokerHands, getDiscardPosition
   sendPokerHand, sendPokerHandWinner, startPokerRound } from './services/games/poker'
 import { delay } from './lib/utility'
 import { sendDiscordMessage } from './services/discord'
-import { checkIfOwnerImposter } from './middleware/banOwnerImposter'
+import { banOwnerImposter, checkIfOwnerImposter } from './middleware/banOwnerImposter'
 
 const port = 9000
 
@@ -95,7 +95,9 @@ const startApp = async () => {
 
         const isOwnerImposter = checkIfOwnerImposter(req)
         if (isOwnerImposter) {
-          console.log('Owner imposter detected, aborting request')
+          console.log('Owner imposter detected, banning user and aborting request.')
+          await banOwnerImposter(req)
+          return
         }
 
         const commandText = getCommandText(req)

@@ -21,6 +21,10 @@ export const config = {
   OWNER_FIRST_NAME: process.env.OWNER_FIRST_NAME,
   OWNER_LAST_NAME: process.env.OWNER_LAST_NAME,
   OWNER_ID: process.env.OWNER_ID ? Number(process.env.OWNER_ID) : undefined,
+  BAN_IMAGE_IDS: process.env.BAN_IMAGE_IDS
+    ?.split(',')
+    .map(Number)
+    .filter(Number.isInteger)
 }
 
 export const telegramAPIBotUrl = `https://api.telegram.org/bot${config.BOT_TOKEN}`
