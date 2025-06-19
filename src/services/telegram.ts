@@ -207,7 +207,7 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
     telegramVideoFile = await galleryGetTelegramVideoFile(chat_id, image_id)
     videoInCache = await checkVideoInCache(telegramVideoFile.telegram_cached_file_id)
   } catch (error) {
-    console.error(error.response?.data || error.message)
+    console.error(error?.response?.data || error?.message)
   }
   
   if (telegramVideoFile && videoInCache) {
@@ -227,15 +227,34 @@ export const uploadAndSendVideoFromCache = async (chat_id: string, image_id: num
       } else {
         await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
       }
-    } else if (image.has_animation) {
+    }
+  }
+}
+
+export const uploadAndSendAnimationFromCache = async (chat_id: string, image_id: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let telegramAnimationFile: any = null
+  let animationInCache = false
+  try {
+    telegramAnimationFile = await galleryGetTelegramVideoFile(chat_id, image_id)
+    animationInCache = await checkAnimationInCache(telegramAnimationFile.telegram_cached_file_id)
+  } catch (error) {
+    console.error(error?.response?.data || error?.message)
+  }
+  
+  if (telegramAnimationFile && animationInCache) {
+    await sendAnimationFromCache(chat_id, telegramAnimationFile.telegram_cached_file_id)
+  } else {
+    const image = await galleryGetImage(image_id.toString())
+    if (image.has_animation) {
       const animationUrl = `${config.GALLERY_IMAGE_BUCKET_ORIGIN}/${image_id}-animation.gif`
       const animationBuffer = await downloadImageAsBuffer(animationUrl)
       const animationPath = `/tmp/${image_id}-animation.gif`
       fs.writeFileSync(animationPath, animationBuffer)
       
-      const telegram_cached_file_id = await uploadVideoToCache(chat_id, animationPath)
+      const telegram_cached_file_id = await uploadAnimationToCache(chat_id, animationPath)
 
-      if (telegramVideoFile && !videoInCache) {
+      if (telegramAnimationFile && !animationInCache) {
         await galleryUpdateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
       } else {
         await galleryCreateTelegramVideoFile(chat_id, image_id, telegram_cached_file_id)
@@ -303,6 +322,68 @@ const sendVideoFromCache = async (chat_id: string, file_id: string): Promise<voi
   } catch (error) {
     console.log('video fileId', file_id)
     console.error(`Failed to send video to chat ${chat_id}:`, error.response?.data || error.message)
+  }
+}
+
+const uploadAnimationToCache = async (chat_id: string, animationPath: string): Promise<string> => {
+  const formData = new FormData()
+  formData.append('chat_id', chat_id)
+  formData.append('animation', fs.createReadStream(animationPath))
+  formData.append('disable_notification', 'true')
+
+  try {
+    const response = await telegramAPIRequest('sendAnimation', {
+      data: formData,
+      headers: {
+        ...formData.getHeaders()
+      }
+    })
+    const fileId = response.data.result.animation.file_id
+    console.log(`Animation uploaded to cache successfully, file_id: ${fileId}`)
+    return fileId
+  } catch (error) {
+    console.log('animationPath', animationPath)
+    console.error('Failed to upload animation to cache:', error.response?.data || error.message)
+    throw error
+  }
+}
+
+export const checkAnimationInCache = async (file_id: string): Promise<boolean> => {
+  try {
+    const response = await telegramAPIRequest('getFile', {
+      data: { file_id },
+      headers: { 'Content-Type': 'application/json' }
+    })
+
+    if (response.data.ok) {
+      console.log(`Animation file exists in cache: ${file_id}`)
+      return true
+    } else {
+      console.log(`Animation file does not exist in cache: ${file_id}`)
+      return false
+    }
+  } catch (error) {
+    console.error(`Error checking animation file in cache: ${file_id}`, error.response?.data || error.message)
+    return false
+  }
+}
+
+const sendAnimationFromCache = async (chat_id: string, file_id: string): Promise<void> => {
+  const formData = new FormData()
+  formData.append('chat_id', chat_id)
+  formData.append('animation', file_id)
+
+  try {
+    const response = await telegramAPIRequest('sendAnimation', {
+      data: formData,
+      headers: {
+        ...formData.getHeaders()
+      }
+    })
+    console.log(`Animation sent successfully to chat ${chat_id}`, response.data)
+  } catch (error) {
+    console.log('animation fileId', file_id)
+    console.error(`Failed to send animation to chat ${chat_id}:`, error.response?.data || error.message)
   }
 }
 

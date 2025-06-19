@@ -18,6 +18,7 @@ import { galleryEditArtist, galleryEditImage, galleryGetArtist, galleryGetImage,
 import { autoDeleteMatchingMessages, getChatId, getCommandText, getImageFile, getMentionedUserNames, getUserMention, getUserName,
   parseEditArtistCommand, parseEditImageCommand, parseUploadImageCommand, sendDocument, sendGalleryAdmin,
   sendImage, sendMessage, setWebhook, 
+  uploadAndSendAnimationFromCache, 
   uploadAndSendVideoFromCache} from './services/telegram'
 import { checkIsAllowedChat } from './middleware/checkIsAllowedChat'
 import { config } from './config'
@@ -26,6 +27,7 @@ import { getMatchingTagTitleFromTagCommandsIndex, initializeTagsCommandsIndexes,
 import { checkIfAllPlayersHaveDiscarded, dealFinalPokerHands, getDiscardPositions, pokerRedrawCardsForPlayer,
   sendPokerHand, sendPokerHandWinner, startPokerRound } from './services/games/poker'
 import { delay } from './lib/utility'
+import { sendDiscordMessage } from './services/discord'
 
 const port = 9000
 
@@ -116,13 +118,14 @@ const startApp = async () => {
             '/meme': (req) => webhookHandlers.getRandomImage(req, true),
             '/my_id': webhookHandlers.myId,
             '/remove_image_background': webhookHandlers.removeImageBackground,
-            '/random_image': webhookHandlers.getRandomImage,
-            '/random': webhookHandlers.getRandomImage,
+            '/random_image': (req) => webhookHandlers.getRandomImage(req, false),
+            '/random': (req) => webhookHandlers.getRandomImage(req, true),
             '/refresh_tags': webhookHandlers.refreshTags,
             '/ui': webhookHandlers.uploadImage,
             '/upload_image': webhookHandlers.uploadImage,
             '/poker_deal': webhookHandlers.pokerDeal,
-            '/poker_draw': webhookHandlers.pokerDraw
+            '/poker_draw': webhookHandlers.pokerDraw,
+            '/raid': webhookHandlers.discordForwardRaidMessage
           }
           
           for (const [command, handler] of Object.entries(commands)) {
@@ -155,7 +158,7 @@ const startApp = async () => {
               if (isVideo) {
                 await uploadAndSendVideoFromCache(groupChatId, image.id)
               } else if (isAnimation) {
-                await uploadAndSendVideoFromCache(groupChatId, image.id)
+                await uploadAndSendAnimationFromCache(groupChatId, image.id)
               } else if (!isVideo && !isAnimation) {
                 const imageUrl = getAvailableImageUrl('no-border', image)
                 if (imageUrl) {
@@ -521,6 +524,17 @@ const webhookHandlers = {
           await sendPokerHandWinner(pokerRound)
         }
       }
+    }
+  },
+  discordForwardRaidMessage: async (req: Request) => {
+    const commandText = getCommandText(req)
+    const raidCommandPattern = /^\/raid\s+(https:\/\/x\.com\/\S+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)$/
+    const match = commandText.match(raidCommandPattern)
+
+    if (match) {
+      const url = match[1]
+      const messageBody = `Telegram Raid 🚨 ${url}`
+      await sendDiscordMessage(messageBody)
     }
   }
 }

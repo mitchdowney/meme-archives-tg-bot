@@ -1,12 +1,19 @@
 import { Forbidden } from 'http-errors'
 import { config } from '../config'
-import { getChatId } from '../services/telegram'
+import { getUserName } from '../services/telegram'
 
-export const checkIsAllowedUser = (req, res, next) => {
-  const chat_id = getChatId(req)
-  if (chat_id && config.BOT_APP_ALLOWED_USER_IDS && config.BOT_APP_ALLOWED_USER_IDS.includes(chat_id)) {
-    next()
+export const checkIsAllowedUser = (req) => {
+  const username = getUserName(req)
+  if (
+    username
+    && config.BOT_APP_ALLOWED_USERNAMES
+    && config.BOT_APP_ALLOWED_USERNAMES.includes(username)) {
+    return true
+  } else if (
+    !config.BOT_APP_ALLOWED_USERNAMES
+    || config.BOT_APP_ALLOWED_USERNAMES?.length === 0) {
+    return true
   } else {
-    throw new Forbidden('Permission denied. Invalid chat id.')
+    throw new Forbidden('Permission denied. Invalid username.')
   }
 }
