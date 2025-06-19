@@ -6,15 +6,6 @@ export const checkIfOwnerImposter = (req) => {
   const last_name = req?.body?.message?.from?.last_name
   const userId = req?.body?.message?.from?.id
 
-  console.log('[banOwnerImposter] Checking user:', {
-    first_name,
-    last_name,
-    userId,
-    OWNER_FIRST_NAME: config.OWNER_FIRST_NAME,
-    OWNER_LAST_NAME: config.OWNER_LAST_NAME,
-    OWNER_ID: config.OWNER_ID
-  })
-
   const firstNameMatches =
     config.OWNER_FIRST_NAME &&
     first_name &&
@@ -24,13 +15,17 @@ export const checkIfOwnerImposter = (req) => {
     !config.OWNER_LAST_NAME ||
     (last_name && config.OWNER_LAST_NAME.toLowerCase() === last_name.toLowerCase())
   const idDoesNotMatch = config.OWNER_ID && config.OWNER_ID !== userId
-
-  console.log('[banOwnerImposter] firstNameMatches:', firstNameMatches)
-  console.log('[banOwnerImposter] lastNameMatches:', lastNameMatches)
-  console.log('[banOwnerImposter] idDoesNotMatch:', idDoesNotMatch)
-
+  
   if (firstNameMatches && lastNameMatches && idDoesNotMatch) {
     console.log('[banOwnerImposter] User is an owner imposter!')
+    console.log('[banOwnerImposter]', {
+      first_name,
+      last_name,
+      userId,
+      OWNER_FIRST_NAME: config.OWNER_FIRST_NAME,
+      OWNER_LAST_NAME: config.OWNER_LAST_NAME,
+      OWNER_ID: config.OWNER_ID
+    })
     return true
   } else {
     console.log('[banOwnerImposter] User is NOT an owner imposter.')
