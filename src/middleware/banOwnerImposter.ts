@@ -1,0 +1,32 @@
+import { config } from '../config'
+
+export const checkIfOwnerImposter = (req) => {
+  const first_name = req?.body?.message?.from?.first_name
+  const last_name = req?.body?.message?.from?.last_name
+  const userId = req?.body?.message?.from?.id
+
+  console.log('[banOwnerImposter] Checking user:', {
+    first_name,
+    last_name,
+    userId,
+    OWNER_FIRST_NAME: config.OWNER_FIRST_NAME,
+    OWNER_LAST_NAME: config.OWNER_LAST_NAME,
+    OWNER_ID: config.OWNER_ID
+  })
+
+  const firstNameMatches = config.OWNER_FIRST_NAME && config.OWNER_FIRST_NAME === first_name
+  const lastNameMatches = !config.OWNER_LAST_NAME || config.OWNER_LAST_NAME === last_name
+  const idDoesNotMatch = config.OWNER_ID && config.OWNER_ID !== userId
+
+  console.log('[banOwnerImposter] firstNameMatches:', firstNameMatches)
+  console.log('[banOwnerImposter] lastNameMatches:', lastNameMatches)
+  console.log('[banOwnerImposter] idDoesNotMatch:', idDoesNotMatch)
+
+  if (firstNameMatches && lastNameMatches && idDoesNotMatch) {
+    console.log('[banOwnerImposter] User is an owner imposter!')
+    return true
+  } else {
+    console.log('[banOwnerImposter] User is NOT an owner imposter.')
+    return false
+  }
+}
