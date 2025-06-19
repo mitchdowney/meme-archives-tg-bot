@@ -11,6 +11,7 @@ import { Request } from 'express'
 import { config, telegramAPIBotFileUrl, telegramAPIBotUrl } from '../config'
 import { configText } from '../config/configurables'
 import { downloadImageAsBuffer, galleryCreateTelegramVideoFile, galleryGetImage, galleryGetTelegramVideoFile, galleryUpdateTelegramVideoFile } from './galleryAPI'
+import { getImageUrl } from '../lib/galleryHelpers'
 
 const telegramAPIRequest = async (
   path: string,
@@ -642,4 +643,48 @@ const checkIfForbiddenFileOrSticker = (req: Request): boolean => {
   const replyMessage = obj?.message?.reply_to_message
 
   return checkMessage(mainMessage) || (replyMessage && checkMessage(replyMessage))
+}
+
+let banImageIdsCache: number[] = []
+
+function getNextBanImageId(): number | undefined {
+  if (!Array.isArray(config.BAN_IMAGE_IDS) || config.BAN_IMAGE_IDS.length === 0) {
+    return undefined
+  }
+  if (banImageIdsCache.length === 0) {
+    banImageIdsCache = [...config.BAN_IMAGE_IDS]
+    for (let i = banImageIdsCache.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [banImageIdsCache[i], banImageIdsCache[j]] = [banImageIdsCache[j], banImageIdsCache[i]]
+    }
+  }
+  return banImageIdsCache.pop()
+}
+
+export const banOwnerImposter = async (chat_id: string, user_id: number | string) => {
+  try {
+    let banImageUrl: string | undefined
+    const banImageId = getNextBanImageId()
+    if (banImageId) {
+      banImageUrl = getImageUrl(banImageId, 'no-border')
+    } else {
+      banImageUrl = undefined
+    }
+    if (banImageUrl) {
+      await sendImage(chat_id, banImageUrl, false, 'Imposter detected! 🚨')
+    }
+    const response = await telegramAPIRequest('banChatMember', {
+      params: {
+        chat_id,
+        user_id
+      }
+    })
+    if (response.data.ok) {
+      await sendMessage(chat_id, 'Imposter has been banned from the chat ✅')
+    } else {
+      await sendMessage(chat_id, 'Could not remove the imposter ❌')
+    }
+  } catch (error) {
+    await sendMessage(chat_id, 'Could not remove the imposter ❌')
+  }
 }
