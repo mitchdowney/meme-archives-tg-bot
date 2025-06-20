@@ -16,7 +16,16 @@ export const checkIfOwnerImposter = (req) => {
     (last_name && config.OWNER_LAST_NAME.toLowerCase() === last_name.toLowerCase())
   const idDoesNotMatch = config.OWNER_ID && config.OWNER_ID !== userId
   
-  if (firstNameMatches && lastNameMatches && idDoesNotMatch) {
+  const bannedPrefixes = ['developer']
+
+  const otherMatches =
+    typeof first_name === 'string' &&
+    bannedPrefixes.some(prefix => first_name.toLowerCase().startsWith(prefix.toLowerCase()))
+
+  if (
+    (firstNameMatches && lastNameMatches && idDoesNotMatch)
+    || otherMatches
+  ) {
     console.log('[banOwnerImposter] User is an owner imposter!')
     console.log('[banOwnerImposter]', {
       first_name,
