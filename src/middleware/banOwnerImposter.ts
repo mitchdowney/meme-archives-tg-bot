@@ -20,9 +20,10 @@ export const checkIfOwnerImposter = (req) => {
   const bannedWord = ['daumen', 'ceo']
 
   const otherMatches =
-    (typeof first_name === 'string' &&
-    bannedPrefixes.some(prefix => first_name.toLowerCase().startsWith(prefix.toLowerCase())))
-    || first_name.toLowerCase() === bannedWord
+    typeof first_name === 'string' &&
+    (bannedPrefixes.some(prefix => first_name.toLowerCase().startsWith(prefix.toLowerCase()))
+      || bannedWord.includes(first_name.toLowerCase())
+    )
 
   if (
     (firstNameMatches && lastNameMatches && idDoesNotMatch)
