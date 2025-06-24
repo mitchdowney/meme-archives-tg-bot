@@ -16,11 +16,13 @@ export const checkIfOwnerImposter = (req) => {
     (last_name && config.OWNER_LAST_NAME.toLowerCase() === last_name.toLowerCase())
   const idDoesNotMatch = config.OWNER_ID && config.OWNER_ID !== userId
   
-  const bannedPrefixes = ['developer']
+  const bannedPrefixes = ['admin', 'developer', 'dev', 'd3v', 'owner', 'creator']
+  const bannedWord = ['daumen', 'ceo']
 
   const otherMatches =
-    typeof first_name === 'string' &&
-    bannedPrefixes.some(prefix => first_name.toLowerCase().startsWith(prefix.toLowerCase()))
+    (typeof first_name === 'string' &&
+    bannedPrefixes.some(prefix => first_name.toLowerCase().startsWith(prefix.toLowerCase())))
+    || first_name.toLowerCase() === bannedWord
 
   if (
     (firstNameMatches && lastNameMatches && idDoesNotMatch)
@@ -45,7 +47,8 @@ export const checkIfOwnerImposter = (req) => {
 export const banOwnerImposter = async (req) => {
   const chat_id = getChatId(req)
   const user_id = req?.body?.message?.from?.id
+  const first_name = req?.body?.message?.from?.first_name
   if (chat_id && user_id) {
-    await banOwnerImposterTelegramRequest(chat_id, user_id)
+    await banOwnerImposterTelegramRequest(chat_id, user_id, first_name)
   }
 }

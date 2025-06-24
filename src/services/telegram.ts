@@ -652,7 +652,7 @@ function getNextBanImageId(): number | undefined {
   return banImageIdsCache.pop()
 }
 
-export const banOwnerImposter = async (chat_id: string, user_id: number | string) => {
+export const banOwnerImposter = async (chat_id: string, user_id: number | string, first_name: string) => {
   try {
     let banImageUrl: string | undefined
     const banImageId = getNextBanImageId()
@@ -671,11 +671,11 @@ export const banOwnerImposter = async (chat_id: string, user_id: number | string
       }
     })
     if (response.data.ok) {
-      await sendMessage(chat_id, 'Imposter has been banned from the chat ✅')
+      await sendMessage(chat_id, `Imposter ${first_name} has been banned from the chat ✅`)
     } else {
-      await sendMessage(chat_id, 'Could not remove the imposter ❌')
+      await sendMessage(chat_id, `Could not remove the imposter ${first_name} ❌`)
     }
   } catch (error) {
-    await sendMessage(chat_id, 'Could not remove the imposter ❌')
+    await sendMessage(chat_id, `Could not remove the imposter ${first_name} ❌`)
   }
 }
